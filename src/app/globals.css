@@ -1,26 +1,129 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Fonts */
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-noto-serif), ui-serif, Georgia, serif;
+
+  /* ── NEUTRAL (estructura y texto) ── */
+  --color-neutral-50:  #ffffff;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #ebebeb;
+  --color-neutral-300: #c2c2c2;
+  --color-neutral-500: #737373;
+  --color-neutral-900: #262626;
+
+  /* ── PRIMARY (verde — exclusivo: botón primario, iconos activos, toggles, links, focus ring) ── */
+  --color-primary-50:  #f0fff6;
+  --color-primary-100: #abecc6;
+  --color-primary-300: #2ecc71;
+  --color-primary-500: #27ae60;
+  --color-primary-700: #1e8449;
+  --color-primary-900: #0d4d26;
+
+  /* ── ACCENT (mostaza — exclusivo: checkout y pago) ── */
+  --color-accent-50:  #fffbf0;
+  --color-accent-100: #fdefc2;
+  --color-accent-300: #f5c842;
+  --color-accent-500: #c9870e;
+  --color-accent-700: #8c5a08;
+  --color-accent-900: #4a2e04;
+
+  /* ── FEEDBACK ── */
+  --color-error:      #d32f2f;
+  --color-error-bg:   #fdeaea;
+  --color-error-dark: #601212;
+  --color-info:       #1565c0;
+  --color-info-bg:    #e3f2fd;
+  --color-info-dark:  #0d3c7a;
+
+  /* ── SHADOWS ── */
+  /* Contenedores blancos: siempre border neutral-200 + sombra del nivel */
+  --shadow-xs: 0px 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0px 1px 3px rgba(0, 0, 0, 0.06), 0px 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0px 4px 8px rgba(0, 0, 0, 0.06), 0px 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0px 8px 16px rgba(0, 0, 0, 0.07), 0px 2px 4px rgba(0, 0, 0, 0.04);
+
+  /* ── BORDER RADIUS ── */
+  /* sm=4px: inputs, badges, tags */
+  /* md=8px: botones, chips, selects */
+  /* lg=12px: tarjetas de publicación */
+  /* xl=16px: modales, drawers, panels */
+  /* 2xl=24px: hero cards, banners */
+  /* 3xl=full: avatares, toggles */
+  --radius-sm:  0.25rem;
+  --radius-md:  0.5rem;
+  --radius-lg:  0.75rem;
+  --radius-xl:  1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 9999px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── BASE ── */
+body {
+  background-color: #f5f5f5;
+  color: #262626;
+  line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.3;
+}
+
+/* ── FOCUS RING ── */
+*:focus-visible {
+  outline: 3px solid #abecc6;
+  outline-offset: 2px;
+}
+
+/* ── MICRO-ANIMATIONS ── */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes drawer-in-right {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes drawer-in-left {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes drawer-in-bottom {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .anim-toast-in     { animation: toast-in 220ms ease-out; }
+  .anim-overlay-in   { animation: overlay-in 180ms ease-out; }
+  .anim-modal-in     { animation: modal-in 220ms ease-out; }
+  .anim-drawer-right { animation: drawer-in-right 260ms cubic-bezier(0.22, 1, 0.36, 1); }
+  .anim-drawer-left  { animation: drawer-in-left 260ms cubic-bezier(0.22, 1, 0.36, 1); }
+  .anim-drawer-bottom { animation: drawer-in-bottom 260ms cubic-bezier(0.22, 1, 0.36, 1); }
 }

@@ -6,6 +6,8 @@ Marketplace B2B multivendor para el ecosistema completo del café en Bolivia. Co
 
 **Este es un prototipo funcional**: no hay backend. Todos los datos son mockeados y se puede simular una sesión completa para navegar todos los flujos como si existiera un backend real.
 
+> **Roadmap del proyecto**: ver [`.claude/PLAN.md`](./PLAN.md) — fases, componentes reutilizables y progreso por checkbox. Léelo al inicio de cada sesión nueva para saber en qué fase estamos.
+
 ---
 
 ## Stack Tecnológico
@@ -313,6 +315,23 @@ El usuario puede guardar con ícono de corazón:
 Accesible desde "Favoritos" en la nav, con dos pestañas: Publicaciones / Vendedores.
 
 ---
+
+## Skills disponibles del proyecto
+
+Al generar pantallas, invocar las skills relevantes. Todas alineadas al mismo design system, no hay conflictos entre ellas.
+
+- **`/design-system`** — tokens, tipografía, componentes y reglas visuales
+- **`/ux-patterns-b2b`** — jerarquía de CTAs, microcopy, formato de precios, WhatsApp, estados
+- **`/frontend-design`** — craft de ejecución (motion, refinamiento, anti-"AI slop")
+- **`/wcag-checklist`** — accesibilidad AA (contraste, ARIA, foco, teclado)
+- **`/responsive-patterns`** — breakpoints Tailwind v4 y patrones por feature
+
+### Combos típicos
+
+- Pantalla nueva: `/design-system` + `/ux-patterns-b2b` (mínimo)
+- Formulario o UI interactiva: sumar `/wcag-checklist`
+- Layout grande: sumar `/responsive-patterns`
+- Para pulir antes de mergear: sumar `/frontend-design`
 
 ## Design System
 
