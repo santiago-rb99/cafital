@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /Users/santiagorojasblanco/Documents/UCB/cafital/src/components/layout /Users/santiagorojasblanco/Documents/UCB/cafital/src/app/\\\\\\(auth\\\\\\) /Users/santiagorojasblanco/Documents/UCB/cafital/src/app/\\\\\\(marketplace\\\\\\) /Users/santiagorojasblanco/Documents/UCB/cafital/src/app/\\\\\\(account\\\\\\) /Users/santiagorojasblanco/Documents/UCB/cafital/src/app/\\\\\\(shop\\\\\\))",
+      "Bash(npx tsc *)",
+      "Bash(npx next *)",
+      "Bash(npx eslint *)"
+    ],
+    "additionalDirectories": [
+      "/Users/santiagorojasblanco/Documents/UCB/cafital/src/components"
+    ]
+  }
+}

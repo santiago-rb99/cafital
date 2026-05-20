@@ -64,12 +64,12 @@ FormField (label + control + helper/error) · ImageDropzone · ImageGallery · Q
 **Objetivo**: cimiento sobre el que se construye todo.
 
 - [x] UI kit completo (átomos + moléculas)
-- [ ] 3 layouts (auth, marketplace, shop)
-- [ ] MarketplaceHeader + Footer
-- [ ] ShopSidebar
-- [ ] ToastRenderer enganchado al `ToastContext`
-- [ ] `lib/api/*` con stubs para todos los recursos
-- [ ] Page 404 + error boundary
+- [x] 3 layouts (auth, marketplace, shop)
+- [x] MarketplaceHeader + Footer
+- [x] ShopSidebar
+- [x] ToastRenderer enganchado al `ToastContext`
+- [x] `lib/api/*` con stubs para todos los recursos
+- [x] Page 404 + error boundary
 
 ### F2 — Auth simulado y onboarding
 **Objetivo**: simular registro y sesión completa.
