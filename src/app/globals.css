@@ -70,10 +70,15 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-/* ── FOCUS RING ── */
-*:focus-visible {
-  outline: 3px solid #abecc6;
-  outline-offset: 2px;
+/* ── FOCUS RING ──
+   En @layer base para que componentes con focus-within propio (Input wrapper,
+   Textarea, Select, etc.) puedan suprimirlo en el elemento interno vía
+   `focus:outline-none` de Tailwind sin perder el ring global en botones/links. */
+@layer base {
+  *:focus-visible {
+    outline: 3px solid #abecc6;
+    outline-offset: 2px;
+  }
 }
 
 /* ── MICRO-ANIMATIONS ── */

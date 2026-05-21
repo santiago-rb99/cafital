@@ -22,9 +22,11 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCart } from '@/contexts/CartContext'
+import { useToast } from '@/contexts/ToastContext'
 import { Avatar, Drawer, IconButton, SearchBar } from '@/components/ui'
 import { Seller } from '@/types'
 import { cn } from '@/lib/utils'
+import { logout as apiLogout } from '@/lib/api/auth'
 
 const NAV_LINKS = [
   { href: '/catalogo', label: 'Catálogo' },
@@ -36,7 +38,9 @@ export function MarketplaceHeader() {
   const router = useRouter()
   const pathname = usePathname()
   const { user, isSeller, logout } = useAuth()
-  const { itemCount } = useCart()
+  const { itemCount, clearCart } = useCart()
+  const { showSuccess, showError } = useToast()
+  const [loggingOut, setLoggingOut] = useState(false)
   const [query, setQuery] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -74,11 +78,30 @@ export function MarketplaceHeader() {
     router.push(q ? `/catalogo?q=${encodeURIComponent(q)}` : '/catalogo')
   }
 
-  function handleLogout() {
-    logout()
+  async function handleLogout() {
+    if (loggingOut) return
+    setLoggingOut(true)
     setMenuOpen(false)
     setMobileOpen(false)
-    router.push('/login')
+    const farewell = displayName
+    try {
+      await apiLogout()
+    } catch {
+      showError(
+        'No pudimos cerrar tu sesión',
+        'Inténtalo nuevamente en unos segundos'
+      )
+      setLoggingOut(false)
+      return
+    }
+    // Navegamos primero para evitar que un RouteGuard intercepte
+    // y redirija a /login?next=<ruta protegida> mientras el state
+    // de sesión cae a null.
+    router.push('/')
+    logout()
+    clearCart()
+    showSuccess('Sesión cerrada', `¡Hasta pronto, ${farewell}!`)
+    setLoggingOut(false)
   }
 
   const sellerName = user?.role === 'seller' ? (user as Seller).businessName : null

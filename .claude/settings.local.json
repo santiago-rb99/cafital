@@ -4,7 +4,18 @@
       "Bash(mkdir -p /Users/santiagorojasblanco/Documents/UCB/cafital/src/components/layout /Users/santiagorojasblanco/Documents/UCB/cafital/src/app/\\\\\\(auth\\\\\\) /Users/santiagorojasblanco/Documents/UCB/cafital/src/app/\\\\\\(marketplace\\\\\\) /Users/santiagorojasblanco/Documents/UCB/cafital/src/app/\\\\\\(account\\\\\\) /Users/santiagorojasblanco/Documents/UCB/cafital/src/app/\\\\\\(shop\\\\\\))",
       "Bash(npx tsc *)",
       "Bash(npx next *)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Read(//private/tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:3000/login)",
+      "Bash(curl -s http://localhost:3000/login)",
+      "Bash(kill 1513)",
+      "Bash(rm -f /tmp/cafital-dev.log)",
+      "Bash(npm run *)",
+      "Bash(echo \"pid=$!\")",
+      "Bash(curl -s -o /dev/null -w \"GET /registro → HTTP %{http_code}\\\\n\" http://localhost:3000/registro)",
+      "Bash(curl -s -o /dev/null -w \"GET /login    → HTTP %{http_code}\\\\n\" http://localhost:3000/login)",
+      "Bash(curl -s http://localhost:3000/registro)",
+      "Bash(grep -oE \"Soy[^<]{0,30}\")"
     ],
     "additionalDirectories": [
       "/Users/santiagorojasblanco/Documents/UCB/cafital/src/components"

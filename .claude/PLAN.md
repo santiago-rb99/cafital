@@ -74,17 +74,17 @@ FormField (label + control + helper/error) · ImageDropzone · ImageGallery · Q
 ### F2 — Auth simulado y onboarding
 **Objetivo**: simular registro y sesión completa.
 
-- [ ] Login (con lista visible de usuarios mock para acceso rápido)
-- [ ] Registro: paso 1 elegir rol → paso 2 datos
-- [ ] Onboarding del comprador (perfil personal)
-- [ ] Onboarding del vendedor (datos del negocio + logo + banner)
-- [ ] Logout
-- [ ] Guards de ruta (`(account)` y `(shop)` requieren sesión; `(shop)` requiere rol seller)
+- [x] Login (con lista visible de usuarios mock para acceso rápido)
+- [x] Registro: paso 1 elegir rol → paso 2 datos
+- [x] Onboarding del comprador (perfil personal)
+- [x] Onboarding del vendedor (datos del negocio + logo + banner)
+- [x] Logout
+- [x] Guards de ruta (`(account)` y `(shop)` requieren sesión; `(shop)` requiere rol seller)
 
 ### F3 — Marketplace browsing (corazón del producto)
 **Objetivo**: navegar y descubrir.
 
-- [ ] **Home**: hero banner rotativo, grid de categorías, vendedores destacados, publicaciones recientes, próximos eventos
+- [x] **Home**: hero banner rotativo, grid de categorías, vendedores destacados, publicaciones recientes, próximos eventos
 - [ ] **Catálogo**:
   - [ ] FilterPanel con filtros estáticos (categoría, subcategoría, precio, departamento, certificaciones)
   - [ ] Filtros dinámicos según subcategoría
