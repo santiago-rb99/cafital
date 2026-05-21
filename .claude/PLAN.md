@@ -85,20 +85,20 @@ FormField (label + control + helper/error) · ImageDropzone · ImageGallery · Q
 **Objetivo**: navegar y descubrir.
 
 - [x] **Home**: hero banner rotativo, grid de categorías, vendedores destacados, publicaciones recientes, próximos eventos
-- [ ] **Catálogo**:
-  - [ ] FilterPanel con filtros estáticos (categoría, subcategoría, precio, departamento, certificaciones)
-  - [ ] Filtros dinámicos según subcategoría
-  - [ ] Búsqueda + ordenamiento
-  - [ ] URL como source of truth de filtros
-- [ ] **Página de publicación**:
-  - [ ] ImageGallery con lightbox
-  - [ ] Selector de unidad + QuantitySelector
-  - [ ] Toggle de compra recurrente (frecuencia + cantidad)
-  - [ ] WhatsAppButton para cotizar
-  - [ ] AttributeRenderer
-  - [ ] Tarjeta del vendedor
-  - [ ] "Productos relacionados"
-- [ ] **Perfil público de vendedor**: 4 variantes (sin plan, Semilla, Cosecha, Exportación)
+- [x] **Catálogo**:
+  - [x] FilterPanel con filtros estáticos (categoría, subcategoría, precio, departamento, certificaciones)
+  - [x] Filtros dinámicos según subcategoría
+  - [x] Búsqueda + ordenamiento
+  - [x] URL como source of truth de filtros
+- [x] **Página de publicación**:
+  - [x] ImageGallery con lightbox
+  - [x] Selector de unidad + QuantitySelector
+  - [x] Toggle de compra recurrente (frecuencia + cantidad)
+  - [x] WhatsAppButton para cotizar
+  - [x] AttributeRenderer
+  - [x] Tarjeta del vendedor
+  - [x] "Productos relacionados"
+- [x] **Perfil público de vendedor**: 4 variantes (sin plan, Semilla, Cosecha, Exportación)
 
 ### F4 — Carrito y checkout
 **Objetivo**: cerrar el flujo de compra directa.

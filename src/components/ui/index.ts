@@ -23,6 +23,7 @@ export { Tooltip } from './Tooltip'
 // Molecules
 export { Breadcrumbs } from './Breadcrumbs'
 export type { BreadcrumbItem } from './Breadcrumbs'
+export { CardCarousel } from './CardCarousel'
 export { ConfirmDialog } from './ConfirmDialog'
 export { CurrencyInput } from './CurrencyInput'
 export { DatePicker } from './DatePicker'

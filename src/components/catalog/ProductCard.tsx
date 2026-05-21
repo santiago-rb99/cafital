@@ -38,14 +38,14 @@ export function ProductCard({ publication, sellerName, className }: ProductCardP
   return (
     <article
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-shadow hover:shadow-md',
+        'group relative flex h-full flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-shadow hover:shadow-md',
         className
       )}
     >
       <Link
         href={`/publicacion/${publication.id}`}
         aria-label={`Ver ${publication.title}`}
-        className="flex flex-col gap-3 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
+        className="flex h-full flex-1 flex-col gap-3 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
       >
         <div className="relative aspect-square overflow-hidden bg-neutral-100">
           <Image

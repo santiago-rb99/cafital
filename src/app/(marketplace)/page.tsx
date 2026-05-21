@@ -9,6 +9,7 @@ import { HeroBanner } from '@/components/home/HeroBanner'
 import { ProductCard } from '@/components/catalog/ProductCard'
 import { EventCard } from '@/components/events/EventCard'
 import { SellerCard } from '@/components/seller/SellerCard'
+import { CardCarousel } from '@/components/ui/CardCarousel'
 
 const PLAN_PRIORITY: Record<Seller['subscriptionPlan'], number> = {
   exportacion: 3,
@@ -101,21 +102,20 @@ export default async function HomePage() {
             linkHref="/vendedores"
             linkLabel="Ver todos los vendedores"
           >
-            <ul
-              role="list"
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-            >
+            <CardCarousel ariaLabel="Vendedores destacados">
               {featuredSellers.map((seller) => {
                 const count = publications.filter(
                   (p) => p.sellerId === seller.id
                 ).length
                 return (
-                  <li key={seller.id}>
-                    <SellerCard seller={seller} publicationsCount={count} />
-                  </li>
+                  <SellerCard
+                    key={seller.id}
+                    seller={seller}
+                    publicationsCount={count}
+                  />
                 )
               })}
-            </ul>
+            </CardCarousel>
           </Section>
         )}
 
@@ -126,22 +126,18 @@ export default async function HomePage() {
             linkHref="/catalogo"
             linkLabel="Ver catálogo completo"
           >
-            <ul
-              role="list"
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            >
+            <CardCarousel ariaLabel="Publicaciones recientes">
               {recentPublications.map((pub) => {
                 const seller = sellersById.get(pub.sellerId)
                 return (
-                  <li key={pub.id}>
-                    <ProductCard
-                      publication={pub}
-                      sellerName={seller?.businessName ?? 'Vendedor Cafital'}
-                    />
-                  </li>
+                  <ProductCard
+                    key={pub.id}
+                    publication={pub}
+                    sellerName={seller?.businessName ?? 'Vendedor Cafital'}
+                  />
                 )
               })}
-            </ul>
+            </CardCarousel>
           </Section>
         )}
 
@@ -152,24 +148,20 @@ export default async function HomePage() {
             linkHref="/eventos"
             linkLabel="Ver todos los eventos"
           >
-            <ul
-              role="list"
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-            >
+            <CardCarousel ariaLabel="Próximos eventos">
               {upcomingEvents.map((event) => {
                 const organizer = sellersById.get(event.organizerId)
                 return (
-                  <li key={event.id}>
-                    <EventCard
-                      event={event}
-                      organizerName={
-                        organizer?.businessName ?? 'Organizador Cafital'
-                      }
-                    />
-                  </li>
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    organizerName={
+                      organizer?.businessName ?? 'Organizador Cafital'
+                    }
+                  />
                 )
               })}
-            </ul>
+            </CardCarousel>
           </Section>
         )}
       </div>

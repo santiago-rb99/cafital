@@ -38,7 +38,7 @@ export function EventCard({ event, organizerName, className }: EventCardProps) {
   return (
     <article
       className={cn(
-        'group flex flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-shadow hover:shadow-md',
+        'group flex h-full flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-shadow hover:shadow-md',
         className
       )}
     >
@@ -46,7 +46,7 @@ export function EventCard({ event, organizerName, className }: EventCardProps) {
         href={`/eventos/${event.id}`}
         className="flex flex-1 flex-col focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
       >
-        <div className="relative aspect-[16/10] overflow-hidden bg-neutral-100">
+        <div className="relative aspect-16/10 overflow-hidden bg-neutral-100">
           <Image
             src={event.image}
             alt={event.name}
@@ -112,7 +112,7 @@ export function EventCard({ event, organizerName, className }: EventCardProps) {
                 className={cn(
                   'inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-medium',
                   soldOut
-                    ? 'bg-[#FDEAEA] text-[#601212]'
+                    ? 'bg-[#FDEAEA] text-error-dark'
                     : 'bg-accent-100 text-accent-900'
                 )}
               >

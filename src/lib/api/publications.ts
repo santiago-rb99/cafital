@@ -27,6 +27,12 @@ export interface PublicationFilters {
   certifications?: string[]
   minPrice?: number
   maxPrice?: number
+  /**
+   * Filtros adicionales por atributo del esquema dinámico de la subcategoría.
+   * Clave: nombre exacto del atributo (`'Proceso de beneficiado'`).
+   * Valor: lista de valores aceptados — el match es OR dentro del atributo.
+   */
+  attributes?: Record<string, string[]>
 }
 
 export interface ListPublicationsOptions {
@@ -51,6 +57,15 @@ function matchesFilters(pub: Publication, f: PublicationFilters): boolean {
     const needle = f.q.toLowerCase()
     const hay = `${pub.title} ${pub.description}`.toLowerCase()
     if (!hay.includes(needle)) return false
+  }
+  if (f.attributes) {
+    for (const [attrKey, accepted] of Object.entries(f.attributes)) {
+      if (accepted.length === 0) continue
+      const raw = pub.attributes[attrKey]
+      if (raw === undefined) return false
+      const haveList = Array.isArray(raw) ? raw : [raw]
+      if (!accepted.some((v) => haveList.includes(v))) return false
+    }
   }
   const lowestPrice = pub.units?.reduce(
     (min, u) => Math.min(min, u.price),

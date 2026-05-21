@@ -3,8 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
-import { Seller, SubscriptionPlan } from '@/types'
+import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Seller } from '@/types'
 import { cn } from '@/lib/utils'
 
 interface HeroSlide {
@@ -16,12 +16,6 @@ interface HeroSlide {
 interface HeroBannerProps {
   slides: HeroSlide[]
   autoplayMs?: number
-}
-
-const PLAN_CHIP: Record<Exclude<SubscriptionPlan, 'none'>, { bg: string; text: string; label: string }> = {
-  semilla: { bg: 'bg-primary-50', text: 'text-primary-700', label: 'Plan Semilla' },
-  cosecha: { bg: 'bg-primary-100', text: 'text-primary-900', label: 'Plan Cosecha' },
-  exportacion: { bg: 'bg-accent-100', text: 'text-accent-900', label: 'Plan Exportación' },
 }
 
 export function HeroBanner({ slides, autoplayMs = 6500 }: HeroBannerProps) {
@@ -49,8 +43,7 @@ export function HeroBanner({ slides, autoplayMs = 6500 }: HeroBannerProps) {
   if (total === 0) return null
 
   const current = slides[index]
-  const plan = current.seller.subscriptionPlan
-  const planMeta = plan !== 'none' ? PLAN_CHIP[plan] : null
+  const isVerified = current.seller.subscriptionPlan !== 'none'
 
   function goTo(next: number) {
     setIndex(((next % total) + total) % total)
@@ -69,22 +62,19 @@ export function HeroBanner({ slides, autoplayMs = 6500 }: HeroBannerProps) {
       <div
         aria-live="polite"
         ref={liveRef}
-        className="grid min-h-[19rem] gap-0 md:min-h-[22rem] md:grid-cols-[1.1fr_1fr]"
+        className="grid min-h-76 gap-0 md:min-h-88 md:grid-cols-[1.1fr_1fr]"
       >
         <div className="flex flex-col justify-center gap-3 px-6 py-8 sm:px-8 sm:py-10 md:px-10">
-          {planMeta && (
-            <span
-              className={cn(
-                'inline-flex w-fit items-center rounded px-2 py-0.5 text-[11px] font-medium',
-                planMeta.bg,
-                planMeta.text
-              )}
-            >
-              {planMeta.label}
-            </span>
-          )}
-          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+          <p className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-neutral-500">
             {current.seller.businessName}
+            {isVerified && (
+              <BadgeCheck
+                size={14}
+                strokeWidth={1.5}
+                className="text-primary-500"
+                aria-label="Vendedor verificado"
+              />
+            )}
           </p>
           <h2 className="font-serif text-2xl font-bold leading-tight text-neutral-900 sm:text-3xl">
             {current.headline}
@@ -109,7 +99,7 @@ export function HeroBanner({ slides, autoplayMs = 6500 }: HeroBannerProps) {
           </div>
         </div>
 
-        <div className="relative min-h-[12rem] md:min-h-full">
+        <div className="relative min-h-48 md:min-h-full">
           {current.seller.banner ? (
             <Image
               src={current.seller.banner}
@@ -122,7 +112,7 @@ export function HeroBanner({ slides, autoplayMs = 6500 }: HeroBannerProps) {
           ) : (
             <div className="absolute inset-0 bg-neutral-100" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/0 to-transparent md:from-white md:via-white/40 md:to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-r from-white via-white/0 to-transparent md:from-white md:via-white/40 md:to-transparent" />
         </div>
       </div>
 
