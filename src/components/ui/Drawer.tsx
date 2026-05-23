@@ -56,19 +56,28 @@ export function Drawer({
 }: DrawerProps) {
   const panelRef = useRef<HTMLDivElement>(null)
 
+  // Focus inicial + bloqueo de scroll: SOLO dependen de `open` para que
+  // re-renders del padre (con nueva referencia a `onClose`) no roben el
+  // foco a inputs internos del drawer.
+  useEffect(() => {
+    if (!open) return
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    panelRef.current?.focus()
+    return () => {
+      document.body.style.overflow = prevOverflow
+    }
+  }, [open])
+
+  // Listener de Escape: depende de `onClose`. Re-attach silencioso si
+  // cambia la referencia; no afecta al foco activo.
   useEffect(() => {
     if (!open) return
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', handleKey)
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    panelRef.current?.focus()
-    return () => {
-      document.removeEventListener('keydown', handleKey)
-      document.body.style.overflow = prevOverflow
-    }
+    return () => document.removeEventListener('keydown', handleKey)
   }, [open, onClose])
 
   if (!open || typeof document === 'undefined') return null

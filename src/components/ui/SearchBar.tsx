@@ -60,6 +60,9 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(
           disabled={disabled}
           className={cn(
             'h-full min-w-0 flex-1 bg-transparent text-sm text-neutral-900 placeholder:text-neutral-300 focus:outline-none disabled:cursor-not-allowed',
+            // Oculta la "X" nativa del input[type=search] (WebKit/Chromium)
+            // para no duplicar el botón de limpiar que ya renderizamos.
+            '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none',
             className
           )}
           {...rest}

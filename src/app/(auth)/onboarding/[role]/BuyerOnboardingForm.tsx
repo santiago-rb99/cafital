@@ -59,19 +59,21 @@ export function BuyerOnboardingForm() {
   const objectUrlRef = useRef<string | null>(null)
 
   // Guard: sólo compradores autenticados acceden. Sin sesión o como vendedor → fuera.
+  const wrongRole = user !== null && user.role !== 'buyer'
+  if (wrongRole && !redirecting) setRedirecting(true)
   useEffect(() => {
-    if (user === null) return
-    if (user.role !== 'buyer') {
-      setRedirecting(true)
-      router.replace('/')
-      return
-    }
-    const buyer = user
-    setName((prev) => prev || buyer.name)
-    setDepartment((prev) => prev || buyer.department || '')
-    setDescription((prev) => prev || buyer.description || '')
-    setAvatarUrl((prev) => prev ?? buyer.avatar ?? null)
-  }, [user, router])
+    if (wrongRole) router.replace('/')
+  }, [wrongRole, router])
+
+  // Hidratar campos del comprador (patrón "state from prop").
+  const [hydratedFromBuyerId, setHydratedFromBuyerId] = useState<string | null>(null)
+  if (user && user.role === 'buyer' && user.id !== hydratedFromBuyerId) {
+    setHydratedFromBuyerId(user.id)
+    setName((prev) => prev || user.name)
+    setDepartment((prev) => prev || user.department || '')
+    setDescription((prev) => prev || user.description || '')
+    setAvatarUrl((prev) => prev ?? user.avatar ?? null)
+  }
 
   // Limpia ObjectURL al desmontar.
   useEffect(() => {

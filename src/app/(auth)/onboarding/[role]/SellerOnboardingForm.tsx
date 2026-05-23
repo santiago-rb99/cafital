@@ -75,22 +75,25 @@ export function SellerOnboardingForm() {
   const logoObjectUrlRef = useRef<string | null>(null)
   const bannerObjectUrlRef = useRef<string | null>(null)
 
+  // Guard: sólo vendedores autenticados acceden. Sin sesión o como comprador → fuera.
+  const wrongRole = user !== null && user.role !== 'seller'
+  if (wrongRole && !redirecting) setRedirecting(true)
   useEffect(() => {
-    if (user === null) return
-    if (user.role !== 'seller') {
-      setRedirecting(true)
-      router.replace('/')
-      return
-    }
-    const seller = user
-    setBusinessName((prev) => prev || seller.businessName)
-    setDepartment((prev) => prev || seller.department || '')
-    setMunicipality((prev) => prev || seller.municipality || '')
-    setDescription((prev) => prev || seller.description || '')
-    setNit((prev) => prev || seller.nit || '')
-    setLogoUrl((prev) => prev ?? seller.logo ?? null)
-    setBannerUrl((prev) => prev ?? seller.banner ?? null)
-  }, [user, router])
+    if (wrongRole) router.replace('/')
+  }, [wrongRole, router])
+
+  // Hidratar campos del vendedor (patrón "state from prop").
+  const [hydratedFromSellerId, setHydratedFromSellerId] = useState<string | null>(null)
+  if (user && user.role === 'seller' && user.id !== hydratedFromSellerId) {
+    setHydratedFromSellerId(user.id)
+    setBusinessName((prev) => prev || user.businessName)
+    setDepartment((prev) => prev || user.department || '')
+    setMunicipality((prev) => prev || user.municipality || '')
+    setDescription((prev) => prev || user.description || '')
+    setNit((prev) => prev || user.nit || '')
+    setLogoUrl((prev) => prev ?? user.logo ?? null)
+    setBannerUrl((prev) => prev ?? user.banner ?? null)
+  }
 
   useEffect(() => {
     return () => {

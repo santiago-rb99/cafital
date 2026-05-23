@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useEffect, useState, useTransition } from 'react'
+import { ReactNode, useState, useTransition } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { X } from 'lucide-react'
 
@@ -52,9 +52,12 @@ export function CatalogToolbar({
   const [query, setQuery] = useState(state.q)
 
   // Mantener el input en sync si la URL cambia desde fuera (ej. limpiar filtros).
-  useEffect(() => {
+  // Patrón "Adjusting state based on props" — corre durante render.
+  const [trackedQ, setTrackedQ] = useState(state.q)
+  if (state.q !== trackedQ) {
+    setTrackedQ(state.q)
     setQuery(state.q)
-  }, [state.q])
+  }
 
   function navigate(next: Partial<CatalogFiltersState>) {
     const merged = { ...state, ...next }

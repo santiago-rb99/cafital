@@ -1,22 +1,30 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { BadgeCheck, MapPin } from 'lucide-react'
-import { Seller } from '@/types'
+import { PublicationCategory, Seller } from '@/types'
+import { CATEGORY_LABEL } from './sellerCategoriesUtils'
 import { cn } from '@/lib/utils'
 
 interface SellerCardProps {
   seller: Seller
   publicationsCount?: number
+  /** Categorías que ofrece el seller (derivadas). Se muestran como chips. */
+  categories?: PublicationCategory[]
   className?: string
 }
 
-export function SellerCard({ seller, publicationsCount, className }: SellerCardProps) {
+export function SellerCard({
+  seller,
+  publicationsCount,
+  categories,
+  className,
+}: SellerCardProps) {
   const isVerified = seller.subscriptionPlan !== 'none'
 
   return (
     <article
       className={cn(
-        'group flex h-full flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-shadow hover:shadow-md',
+        'anim-fade-in-up group flex h-full flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-shadow hover:shadow-md',
         className
       )}
     >
@@ -86,6 +94,19 @@ export function SellerCard({ seller, publicationsCount, className }: SellerCardP
             <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-neutral-500">
               {seller.description}
             </p>
+          )}
+
+          {categories && categories.length > 0 && (
+            <ul className="mt-3 flex flex-wrap gap-1.5">
+              {categories.slice(0, 3).map((c) => (
+                <li
+                  key={c}
+                  className="inline-flex items-center rounded bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-900"
+                >
+                  {CATEGORY_LABEL[c]}
+                </li>
+              ))}
+            </ul>
           )}
 
           {typeof publicationsCount === 'number' && (

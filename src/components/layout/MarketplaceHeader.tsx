@@ -16,17 +16,21 @@ import {
   Menu,
   Package,
   Repeat,
+  Settings,
   ShoppingCart,
+  Sparkles,
   Store,
+  Ticket,
   User as UserIcon,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCart } from '@/contexts/CartContext'
 import { useToast } from '@/contexts/ToastContext'
 import { Avatar, Drawer, IconButton, SearchBar } from '@/components/ui'
-import { Seller } from '@/types'
-import { cn } from '@/lib/utils'
+import { Seller, SubscriptionPlan } from '@/types'
+import { cn, subscriptionLabel } from '@/lib/utils'
 import { logout as apiLogout } from '@/lib/api/auth'
+import { CartDrawer } from '@/components/cart/CartDrawer'
 
 const NAV_LINKS = [
   { href: '/catalogo', label: 'Catálogo' },
@@ -44,6 +48,7 @@ export function MarketplaceHeader() {
   const [query, setQuery] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [cartOpen, setCartOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const menuTriggerRef = useRef<HTMLButtonElement>(null)
 
@@ -152,12 +157,18 @@ export function MarketplaceHeader() {
 
         {/* Icon actions — md+ */}
         <div className="hidden items-center gap-1 md:flex">
+          {isSeller && (
+            <PlansPill
+              currentPlan={(user as Seller).subscriptionPlan}
+              onClick={() => router.push('/mi-tienda/planes')}
+            />
+          )}
           <IconButton
             onClick={() => router.push('/favoritos')}
             icon={<Heart size={20} strokeWidth={1.5} />}
             label="Mis favoritos"
           />
-          <CartIconButton count={itemCount} onClick={() => router.push('/carrito')} />
+          <CartIconButton count={itemCount} onClick={() => setCartOpen(true)} />
 
           {user ? (
             <div className="relative ml-1">
@@ -225,16 +236,48 @@ export function MarketplaceHeader() {
                     >
                       Compras recurrentes
                     </MenuItem>
+                    <MenuItem
+                      href="/inscripciones"
+                      icon={<Ticket size={18} strokeWidth={1.5} />}
+                      onSelect={() => setMenuOpen(false)}
+                    >
+                      Mis inscripciones
+                    </MenuItem>
+                    <MenuItem
+                      href="/favoritos"
+                      icon={<Heart size={18} strokeWidth={1.5} />}
+                      onSelect={() => setMenuOpen(false)}
+                    >
+                      Favoritos
+                    </MenuItem>
                     {isSeller && (
-                      <MenuItem
-                        href="/mi-tienda"
-                        icon={<Store size={18} strokeWidth={1.5} />}
-                        onSelect={() => setMenuOpen(false)}
-                      >
-                        Mi Tienda
-                      </MenuItem>
+                      <>
+                        <MenuItem
+                          href="/mi-tienda"
+                          icon={<Store size={18} strokeWidth={1.5} />}
+                          onSelect={() => setMenuOpen(false)}
+                        >
+                          Mi Tienda
+                        </MenuItem>
+                        <MenuItem
+                          href="/mi-tienda/planes"
+                          icon={<Sparkles size={18} strokeWidth={1.5} />}
+                          onSelect={() => setMenuOpen(false)}
+                        >
+                          Planes
+                        </MenuItem>
+                      </>
                     )}
                   </ul>
+                  <div className="border-t border-neutral-200 py-1">
+                    <MenuItem
+                      href="/ajustes"
+                      icon={<Settings size={18} strokeWidth={1.5} />}
+                      onSelect={() => setMenuOpen(false)}
+                    >
+                      Ajustes
+                    </MenuItem>
+                  </div>
                   <div className="border-t border-neutral-200 py-1">
                     <button
                       type="button"
@@ -261,7 +304,7 @@ export function MarketplaceHeader() {
 
         {/* Mobile actions */}
         <div className="flex items-center gap-1 md:hidden">
-          <CartIconButton count={itemCount} onClick={() => router.push('/carrito')} />
+          <CartIconButton count={itemCount} onClick={() => setCartOpen(true)} />
           <IconButton
             onClick={() => setMobileOpen(true)}
             icon={<Menu size={22} strokeWidth={1.5} />}
@@ -293,6 +336,8 @@ export function MarketplaceHeader() {
         avatarSrc={avatarSrc}
         itemCount={itemCount}
       />
+
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </header>
   )
 }
@@ -323,6 +368,35 @@ function NavLink({
     >
       {children}
     </Link>
+  )
+}
+
+function PlansPill({
+  currentPlan,
+  onClick,
+}: {
+  currentPlan: SubscriptionPlan
+  onClick: () => void
+}) {
+  const isFree = currentPlan === 'none'
+  const label = isFree ? 'Mejorar plan' : subscriptionLabel(currentPlan)
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={isFree ? 'Ver planes disponibles' : `Ver planes — actual: ${label}`}
+      className={cn(
+        'inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100',
+        isFree
+          ? 'border-primary-500 bg-white text-primary-700 hover:bg-primary-50'
+          : 'border-primary-300 bg-primary-50 text-primary-700 hover:bg-primary-100'
+      )}
+    >
+      <Sparkles size={14} strokeWidth={1.5} aria-hidden />
+      <span className="hidden xl:inline">{label}</span>
+      <span className="xl:hidden">Planes</span>
+    </button>
   )
 }
 
@@ -482,16 +556,45 @@ function MobileMenu({
             >
               Compras recurrentes
             </MobileNavLink>
+            <MobileNavLink
+              href="/inscripciones"
+              active={isActive(pathname, '/inscripciones')}
+              onSelect={onClose}
+              icon={<Ticket size={18} strokeWidth={1.5} />}
+            >
+              Mis inscripciones
+            </MobileNavLink>
             {isSeller && (
-              <MobileNavLink
-                href="/mi-tienda"
-                active={isActive(pathname, '/mi-tienda')}
-                onSelect={onClose}
-                icon={<Store size={18} strokeWidth={1.5} />}
-              >
-                Mi Tienda
-              </MobileNavLink>
+              <>
+                <MobileNavLink
+                  href="/mi-tienda"
+                  active={
+                    isActive(pathname, '/mi-tienda') &&
+                    !isActive(pathname, '/mi-tienda/planes')
+                  }
+                  onSelect={onClose}
+                  icon={<Store size={18} strokeWidth={1.5} />}
+                >
+                  Mi Tienda
+                </MobileNavLink>
+                <MobileNavLink
+                  href="/mi-tienda/planes"
+                  active={isActive(pathname, '/mi-tienda/planes')}
+                  onSelect={onClose}
+                  icon={<Sparkles size={18} strokeWidth={1.5} />}
+                >
+                  Planes
+                </MobileNavLink>
+              </>
             )}
+            <MobileNavLink
+              href="/ajustes"
+              active={isActive(pathname, '/ajustes')}
+              onSelect={onClose}
+              icon={<Settings size={18} strokeWidth={1.5} />}
+            >
+              Ajustes
+            </MobileNavLink>
           </ul>
         </nav>
 

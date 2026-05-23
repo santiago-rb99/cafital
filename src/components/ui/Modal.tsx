@@ -21,12 +21,23 @@ interface ModalProps {
   title?: ReactNode
   description?: ReactNode
   size?: ModalSize
-  children: ReactNode
+  /** Cuerpo visible del modal. Omitir si la cabecera/descripción son suficientes. */
+  children?: ReactNode
   footer?: ReactNode
   closeOnOverlay?: boolean
   hideCloseButton?: boolean
   className?: string
   ariaLabel?: string
+}
+
+/**
+ * Detecta children "vacíos" para no renderizar el wrapper con padding visible
+ * cuando solo se pasó algo invisible (ej. un <span className="sr-only">).
+ */
+function hasVisibleChildren(children: ReactNode): boolean {
+  if (children === null || children === undefined || children === false) return false
+  if (typeof children === 'string' && children.trim() === '') return false
+  return true
 }
 
 export function Modal({
@@ -44,19 +55,28 @@ export function Modal({
 }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
 
+  // Focus inicial + bloqueo de scroll: SOLO dependen de `open` para que
+  // re-renders del padre (que pueden traer una nueva referencia a `onClose`)
+  // no roben el foco a inputs internos.
+  useEffect(() => {
+    if (!open) return
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    dialogRef.current?.focus()
+    return () => {
+      document.body.style.overflow = prevOverflow
+    }
+  }, [open])
+
+  // Listener de Escape: depende de `onClose`. Re-attach silencioso si
+  // cambia la referencia; no afecta al foco activo.
   useEffect(() => {
     if (!open) return
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', handleKey)
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    dialogRef.current?.focus()
-    return () => {
-      document.removeEventListener('keydown', handleKey)
-      document.body.style.overflow = prevOverflow
-    }
+    return () => document.removeEventListener('keydown', handleKey)
   }, [open, onClose])
 
   if (!open || typeof document === 'undefined') return null
@@ -102,7 +122,9 @@ export function Modal({
             )}
           </div>
         )}
-        <div className="px-6 py-5">{children}</div>
+        {hasVisibleChildren(children) && (
+          <div className="px-6 py-5">{children}</div>
+        )}
         {footer && (
           <div className="flex items-center justify-end gap-2 border-t border-neutral-200 bg-neutral-100/50 px-6 py-4">
             {footer}

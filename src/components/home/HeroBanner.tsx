@@ -53,7 +53,7 @@ export function HeroBanner({ slides, autoplayMs = 6500 }: HeroBannerProps) {
     <section
       aria-roledescription="carousel"
       aria-label="Vendedores destacados"
-      className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm"
+      className="relative"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -62,7 +62,7 @@ export function HeroBanner({ slides, autoplayMs = 6500 }: HeroBannerProps) {
       <div
         aria-live="polite"
         ref={liveRef}
-        className="grid min-h-76 gap-0 md:min-h-88 md:grid-cols-[1.1fr_1fr]"
+        className="grid min-h-76 gap-0 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm md:min-h-88 md:grid-cols-[1.1fr_1fr]"
       >
         <div className="flex flex-col justify-center gap-3 px-6 py-8 sm:px-8 sm:py-10 md:px-10">
           <p className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-neutral-500">
@@ -122,7 +122,7 @@ export function HeroBanner({ slides, autoplayMs = 6500 }: HeroBannerProps) {
             type="button"
             onClick={() => goTo(index - 1)}
             aria-label="Vendedor anterior"
-            className="absolute left-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-neutral-200 bg-white/95 text-neutral-500 shadow-sm transition-colors hover:bg-white hover:text-neutral-900 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100 md:inline-flex"
+            className="absolute -left-5 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 shadow-md transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100 md:inline-flex"
           >
             <ChevronLeft size={18} strokeWidth={1.5} aria-hidden />
           </button>
@@ -130,7 +130,7 @@ export function HeroBanner({ slides, autoplayMs = 6500 }: HeroBannerProps) {
             type="button"
             onClick={() => goTo(index + 1)}
             aria-label="Siguiente vendedor"
-            className="absolute right-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-neutral-200 bg-white/95 text-neutral-500 shadow-sm transition-colors hover:bg-white hover:text-neutral-900 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100 md:inline-flex"
+            className="absolute -right-5 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 shadow-md transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100 md:inline-flex"
           >
             <ChevronRight size={18} strokeWidth={1.5} aria-hidden />
           </button>

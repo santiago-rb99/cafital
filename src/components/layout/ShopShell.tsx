@@ -11,6 +11,9 @@ export function ShopShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-1 flex-col md:flex-row">
+      <a href="#shop-main-content" className="skip-link">
+        Saltar al contenido
+      </a>
       {/* Sidebar fijo — md+ */}
       <aside className="hidden border-r border-neutral-200 bg-white md:flex md:w-60 md:shrink-0 md:flex-col">
         <ShopSidebar />
@@ -44,7 +47,7 @@ export function ShopShell({ children }: { children: ReactNode }) {
         </div>
       </Drawer>
 
-      <main className="flex-1 bg-neutral-100">
+      <main id="shop-main-content" className="flex-1 bg-neutral-100">
         <div className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-10">
           {children}
         </div>

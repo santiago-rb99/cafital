@@ -103,74 +103,74 @@ FormField (label + control + helper/error) · ImageDropzone · ImageGallery · Q
 ### F4 — Carrito y checkout
 **Objetivo**: cerrar el flujo de compra directa.
 
-- [ ] Cart drawer (acceso desde header)
-- [ ] Cart page completa
-- [ ] Checkout (datos de envío + resumen + simulación de pago)
-- [ ] Confirmación de pedido
-- [ ] Detalle de pedido
-- [ ] Reglas: cat D y bajo cotización **no** entran al carrito, solo WhatsApp
+- [x] Cart drawer (acceso desde header)
+- [x] Cart page completa
+- [x] Checkout (datos de envío + resumen + simulación de pago)
+- [x] Confirmación de pedido
+- [x] Detalle de pedido
+- [x] Reglas: cat D y bajo cotización **no** entran al carrito, solo WhatsApp
 
 ### F5 — Cuenta del comprador
 **Objetivo**: cerrar experiencia del comprador.
 
-- [ ] Perfil + edición de datos
-- [ ] Mis pedidos (historial con filtros por estado + detalle)
-- [ ] Favoritos (tabs Publicaciones / Vendedores)
-- [ ] Mis suscripciones recurrentes (pausar, editar frecuencia/cantidad, cancelar)
-- [ ] Ajustes generales
+- [x] Perfil + edición de datos
+- [x] Mis pedidos (historial con filtros por estado + detalle)
+- [x] Favoritos (tabs Publicaciones / Vendedores)
+- [x] Mis suscripciones recurrentes (pausar, editar frecuencia/cantidad, cancelar)
+- [x] Ajustes generales
 
 ### F6 — Eventos
 **Objetivo**: ver e inscribirse.
 
-- [ ] Lista con filtros (tipo, modalidad, departamento, fecha)
-- [ ] Detalle de evento
-- [ ] Inscripción gratuita (confirmación inmediata)
-- [ ] Inscripción con precio (checkout reducido)
-- [ ] Mis inscripciones en perfil del comprador
+- [x] Lista con filtros (tipo, modalidad, departamento, fecha)
+- [x] Detalle de evento
+- [x] Inscripción gratuita (confirmación inmediata)
+- [x] Inscripción con precio (checkout reducido)
+- [x] Mis inscripciones en perfil del comprador
 
 ### F7 — Mi Tienda (vista vendedor)
 **Objetivo**: gestión operativa del vendedor.
 
-- [ ] Dashboard (ventas del período, pedidos recibidos, publicaciones activas)
-- [ ] Lista de pedidos recibidos + cambio de estado
-- [ ] Tabla "Mis publicaciones" con acciones (editar, pausar, eliminar)
-- [ ] Tabla "Mis eventos"
-- [ ] Ajustes de tienda (datos del negocio, logo, banner)
+- [x] Dashboard (ventas del período, pedidos recibidos, publicaciones activas)
+- [x] Lista de pedidos recibidos + cambio de estado
+- [x] Tabla "Mis publicaciones" con acciones (editar, pausar, eliminar)
+- [x] Tabla "Mis eventos"
+- [x] Ajustes de tienda (datos del negocio, logo, banner)
 
 ### F8 — Formulario de publicación (pieza más compleja)
 **Objetivo**: crear/editar publicaciones de las 4 categorías.
 
-- [ ] Esquema de atributos por subcategoría en `data/schemas/`
-- [ ] Multi-step:
-  - [ ] Paso 1: Categoría
-  - [ ] Paso 2: Subcategoría
-  - [ ] Paso 3: Info base (fotos via Dropzone, título, descripción, variantes, video)
-  - [ ] Paso 4: Atributos dinámicos
-  - [ ] Paso 5: Precio y logística (toggle precio/cotización, tabla repetible de unidades, cobertura, inventario, descuento, recurrente)
-  - [ ] Paso 6: Vista previa idéntica a la página real
-  - [ ] Paso 7: Publicar / Guardar borrador
-- [ ] Formulario de evento (single step)
+- [x] Esquema de atributos por subcategoría en `data/schemas/`
+- [x] Multi-step:
+  - [x] Paso 1: Categoría
+  - [x] Paso 2: Subcategoría
+  - [x] Paso 3: Info base (fotos via Dropzone, título, descripción, variantes, video)
+  - [x] Paso 4: Atributos dinámicos
+  - [x] Paso 5: Precio y logística (toggle precio/cotización, tabla repetible de unidades, cobertura, inventario, descuento, recurrente)
+  - [x] Paso 6: Vista previa idéntica a la página real
+  - [x] Paso 7: Publicar / Guardar borrador
+- [x] Formulario de evento (single step)
 
 ### F9 — Suscripciones del vendedor
 **Objetivo**: diferenciación visual y de capacidades por plan.
 
-- [ ] Página de planes (3 PlanCards con comparativa)
-- [ ] Flujo de contratación simulado
-- [ ] Plan actual visible en Mi Tienda + cambiar plan
-- [ ] Bloque "Sobre nosotros" editable (solo Exportación)
-- [ ] Carrusel de imágenes adicionales (Cosecha hasta 5, Exportación hasta 10)
-- [ ] Estadísticas (solo Exportación): visitas por publicación
-- [ ] Perfil público y home reflejan privilegios del plan
+- [x] Página de planes (3 PlanCards con comparativa)
+- [x] Flujo de contratación simulado
+- [x] Plan actual visible en Mi Tienda + cambiar plan
+- [x] Bloque "Sobre nosotros" editable (solo Exportación)
+- [x] Carrusel de imágenes adicionales (Cosecha hasta 5, Exportación hasta 10)
+- [x] Estadísticas (solo Exportación): visitas por publicación
+- [x] Perfil público y home reflejan privilegios del plan
 
 ### F10 — Polish y QA
 **Objetivo**: calidad demo-ready.
 
-- [ ] Loading states con Skeletons coherentes
-- [ ] Empty states pulidos en todas las listas
-- [ ] Error states (404 + generic error boundary)
-- [ ] Revisión mobile completa (header colapsable, filtros como drawer, tablas responsive)
-- [ ] Microanimaciones (fade-in cards, slide drawer, toast)
-- [ ] A11y básico (focus visible, ARIA en modales/drawers, navegación por teclado)
+- [x] Loading states con Skeletons coherentes
+- [x] Empty states pulidos en todas las listas
+- [x] Error states (404 + generic error boundary)
+- [x] Revisión mobile completa (header colapsable, filtros como drawer, tablas responsive)
+- [x] Microanimaciones (fade-in cards, slide drawer, toast)
+- [x] A11y básico (focus visible, ARIA en modales/drawers, navegación por teclado)
 
 ---
 

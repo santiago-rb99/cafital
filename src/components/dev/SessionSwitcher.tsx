@@ -13,8 +13,6 @@ export function DevSessionSwitcher() {
 
   if (process.env.NODE_ENV !== 'development') return null
 
-  const currentDev = DEV_USERS.find((u) => u.id === user?.id)
-
   return (
     <div className="fixed bottom-4 right-4 z-50 font-sans text-sm">
       {open && (
