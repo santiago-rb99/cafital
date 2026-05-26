@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, CheckCircle2, MapPin } from 'lucide-react'
+import { ArrowRight, CheckCircle2, MapPin, Phone, Truck, User } from 'lucide-react'
 
 import { getOrder } from '@/lib/api/orders'
 import { getUser } from '@/lib/api/users'
@@ -35,7 +35,7 @@ export default async function PedidoPage({
   )
 
   return (
-    <div className="bg-neutral-100">
+    <div className="bg-page">
       <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <Breadcrumbs
           items={[
@@ -131,6 +131,85 @@ export default async function PedidoPage({
                 )}
               </div>
             </section>
+
+            {order.shippingAddress && (
+              <section
+                aria-labelledby="shipping-heading"
+                className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm"
+              >
+                <header className="mb-4 flex items-center gap-2">
+                  <Truck
+                    size={16}
+                    strokeWidth={1.5}
+                    className="text-neutral-500"
+                    aria-hidden
+                  />
+                  <h2
+                    id="shipping-heading"
+                    className="text-xs font-medium uppercase tracking-wider text-neutral-500"
+                  >
+                    Datos de envío
+                  </h2>
+                </header>
+                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="flex items-start gap-2">
+                    <User
+                      size={14}
+                      strokeWidth={1.5}
+                      className="mt-0.5 shrink-0 text-neutral-500"
+                      aria-hidden
+                    />
+                    <div className="flex flex-col">
+                      <dt className="text-xs text-neutral-500">Destinatario</dt>
+                      <dd className="text-sm font-medium text-neutral-900">
+                        {order.shippingAddress.fullName}
+                      </dd>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Phone
+                      size={14}
+                      strokeWidth={1.5}
+                      className="mt-0.5 shrink-0 text-neutral-500"
+                      aria-hidden
+                    />
+                    <div className="flex flex-col">
+                      <dt className="text-xs text-neutral-500">Teléfono</dt>
+                      <dd className="text-sm font-medium tabular-nums text-neutral-900">
+                        {order.shippingAddress.phone}
+                      </dd>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 sm:col-span-2">
+                    <MapPin
+                      size={14}
+                      strokeWidth={1.5}
+                      className="mt-0.5 shrink-0 text-neutral-500"
+                      aria-hidden
+                    />
+                    <div className="flex flex-col">
+                      <dt className="text-xs text-neutral-500">Dirección</dt>
+                      <dd className="text-sm font-medium text-neutral-900">
+                        {order.shippingAddress.address}
+                      </dd>
+                      <dd className="text-xs text-neutral-500">
+                        {order.shippingAddress.city}, {order.shippingAddress.department}
+                      </dd>
+                    </div>
+                  </div>
+                  {order.shippingAddress.notes && (
+                    <div className="sm:col-span-2 rounded-lg border border-neutral-200 bg-neutral-100 p-3">
+                      <dt className="mb-1 text-xs font-medium text-neutral-500">
+                        Notas para la entrega
+                      </dt>
+                      <dd className="text-sm leading-relaxed text-neutral-900">
+                        {order.shippingAddress.notes}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              </section>
+            )}
 
             <section
               aria-labelledby="items-heading"

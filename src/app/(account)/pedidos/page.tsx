@@ -71,7 +71,7 @@ export default function PedidosPage() {
 
   if (!isHydrated || loading) {
     return (
-      <div className="bg-neutral-100">
+      <div className="bg-page">
         <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
           <div className="mb-6 flex flex-col gap-2">
             <Skeleton className="h-7 w-44" />
@@ -95,7 +95,7 @@ export default function PedidosPage() {
   }
 
   return (
-    <div className="bg-neutral-100">
+    <div className="bg-page">
       <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <Breadcrumbs items={[{ label: 'Mis pedidos' }]} className="mb-5" />
 
@@ -156,7 +156,7 @@ export default function PedidosPage() {
             action={
               <Link
                 href="/catalogo"
-                className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
+                className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
               >
                 Ver catálogo
               </Link>

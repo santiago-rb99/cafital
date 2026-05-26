@@ -15,6 +15,8 @@ import {
 } from '@/components/catalog/catalogFiltersState'
 import { getDynamicFiltersForSubcategory } from '@/data/schemas/dynamicFilters'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { HeroBanner } from '@/components/home/HeroBanner'
+import { buildSellerHeroSlides } from '@/components/home/heroSlides'
 
 type SearchParamValue = string | string[] | undefined
 
@@ -31,17 +33,27 @@ export default async function CatalogoPage({
     listSellers(),
   ])
 
-  const dynamicFilters = getDynamicFiltersForSubcategory(state.subcategory)
+  const dynamicFilters =
+    state.subcategories.length === 1
+      ? getDynamicFiltersForSubcategory(state.subcategories[0])
+      : []
   const publications = await listPublications({
     filters: toApiFilters(state, dynamicFilters),
     sort: state.sort,
   })
 
   const sellersById = new Map(sellers.map((s) => [s.id, s]))
+  const heroSlides = buildSellerHeroSlides(sellers)
 
   return (
-    <div className="bg-neutral-100">
+    <div className="bg-page">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+        {heroSlides.length > 0 && (
+          <div className="mb-8 sm:mb-10">
+            <HeroBanner slides={heroSlides} />
+          </div>
+        )}
+
         <header className="mb-6 flex flex-col gap-1 sm:mb-8">
           <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
             Catálogo

@@ -41,7 +41,7 @@ export default function ErrorPage({ error, unstable_retry }: ErrorPageProps) {
           <button
             type="button"
             onClick={() => unstable_retry()}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-300 px-5 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-300 px-5 text-sm font-semibold text-white transition-colors hover:bg-primary-500"
           >
             <RotateCcw size={16} strokeWidth={1.5} />
             Reintentar

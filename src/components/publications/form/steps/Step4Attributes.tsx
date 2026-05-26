@@ -46,6 +46,20 @@ export function Step4Attributes({ data, onChange, errors }: Props) {
     } else {
       next[key] = value
     }
+
+    // Si el campo recién modificado es padre de algún cascade, limpiar la
+    // selección del hijo cuando ya no sea válida para el nuevo padre.
+    for (const f of schema) {
+      if (f.type !== 'cascade' || !f.cascade || f.cascade.from !== key) continue
+      const childValue = next[f.key]
+      if (typeof childValue !== 'string') continue
+      const newOptions =
+        typeof value === 'string' ? f.cascade.map[value] ?? [] : []
+      if (!newOptions.includes(childValue)) {
+        delete next[f.key]
+      }
+    }
+
     onChange({ attributes: next })
   }
 
@@ -61,15 +75,24 @@ export function Step4Attributes({ data, onChange, errors }: Props) {
       </header>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        {schema.map((field) => (
-          <AttributeFieldRow
-            key={field.key}
-            field={field}
-            value={data.attributes[field.key]}
-            onChange={(v) => patchAttr(field.key, v)}
-            error={errors[field.key]}
-          />
-        ))}
+        {schema.map((field) => {
+          const parentValue =
+            field.type === 'cascade' && field.cascade
+              ? data.attributes[field.cascade.from]
+              : undefined
+          return (
+            <AttributeFieldRow
+              key={field.key}
+              field={field}
+              value={data.attributes[field.key]}
+              onChange={(v) => patchAttr(field.key, v)}
+              error={errors[field.key]}
+              parentValue={
+                typeof parentValue === 'string' ? parentValue : undefined
+              }
+            />
+          )
+        })}
       </div>
     </div>
   )
@@ -80,11 +103,13 @@ function AttributeFieldRow({
   value,
   onChange,
   error,
+  parentValue,
 }: {
   field: AttributeField
   value: string | string[] | undefined
   onChange: (v: string | string[] | undefined) => void
   error?: string
+  parentValue?: string
 }) {
   const label = field.label ?? field.key
 
@@ -116,11 +141,36 @@ function AttributeFieldRow({
     )
   }
 
+  if (field.type === 'cascade' && field.cascade) {
+    const options = parentValue ? field.cascade.map[parentValue] ?? [] : []
+    const v = typeof value === 'string' ? value : ''
+    const disabled = !parentValue
+    const helperOverride = !parentValue
+      ? field.helper ?? 'Selecciona primero el departamento.'
+      : options.length === 0
+        ? 'Este departamento no tiene zonas cafeteras registradas. Puedes continuar sin zona.'
+        : field.helper
+    return (
+      <FormField
+        label={label}
+        required={field.required}
+        error={error}
+        helper={helperOverride}
+      >
+        <Select
+          value={v}
+          onChange={(e) => onChange(e.target.value || undefined)}
+          placeholder={disabled ? 'Elige un departamento primero' : 'Selecciona'}
+          disabled={disabled || options.length === 0}
+          options={options.map((o) => ({ value: o, label: o }))}
+        />
+      </FormField>
+    )
+  }
+
   if (field.type === 'number') {
-    const v: number | '' =
-      typeof value === 'string' && value !== ''
-        ? Number(value) || ''
-        : ''
+    const raw = typeof value === 'string' && value !== '' ? Number(value) : NaN
+    const v: number | '' = Number.isNaN(raw) ? '' : raw
     return (
       <FormField label={label} required={field.required} error={error} helper={field.helper}>
         <NumberInput
@@ -128,6 +178,7 @@ function AttributeFieldRow({
           onChange={(n) => onChange(n === '' ? undefined : String(n))}
           min={field.min ?? 0}
           max={field.max}
+          step={field.step ?? 1}
           suffix={field.suffix}
           placeholder={field.placeholder}
         />

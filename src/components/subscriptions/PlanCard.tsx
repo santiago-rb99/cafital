@@ -70,7 +70,7 @@ export function PlanCard({
       )}
     >
       {recommended && (
-        <span className="absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-primary-300 px-3 py-1 text-[11px] font-semibold text-primary-900">
+        <span className="absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-primary-300 px-3 py-1 text-[11px] font-semibold text-white">
           <Sparkles size={12} strokeWidth={2} aria-hidden />
           Recomendado
         </span>
@@ -95,7 +95,7 @@ export function PlanCard({
         {plan.highlights.map((h) => (
           <li key={h} className="flex items-start gap-2 text-sm text-neutral-900">
             <span
-              className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-300 text-primary-900"
+              className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-300 text-white"
               aria-hidden
             >
               <Check size={12} strokeWidth={2.5} />

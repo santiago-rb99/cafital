@@ -229,7 +229,7 @@ export function RecurringSubscriptionCard({
               type="button"
               onClick={saveEdit}
               disabled={pending}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary-300 px-3 text-[13px] font-semibold text-primary-900 transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary-300 px-3 text-[13px] font-semibold text-white transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Check size={14} strokeWidth={1.5} aria-hidden />
               Guardar

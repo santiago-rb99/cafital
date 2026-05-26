@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Trash2 } from 'lucide-react'
+import { Bookmark, RotateCw, Trash2 } from 'lucide-react'
 import { CartItem } from '@/types'
 import { QuantitySelector } from '@/components/ui/QuantitySelector'
 import { useCart } from '@/contexts/CartContext'
@@ -10,8 +10,12 @@ import { cn, formatPrice } from '@/lib/utils'
 
 interface CartItemRowProps {
   item: CartItem
-  /** En el drawer (compact) se omite el QuantitySelector; el usuario lo edita en /carrito. */
-  variant?: 'compact' | 'full'
+  /**
+   * - `compact`: vista usada en el resumen del checkout (sin selector ni acciones).
+   * - `full`: carrito activo, con selector de cantidad + acciones.
+   * - `saved`: ítem en "Guardados para más tarde" — sin selector, con CTA "Mover al carrito".
+   */
+  variant?: 'compact' | 'full' | 'saved'
   className?: string
 }
 
@@ -24,14 +28,23 @@ export function CartItemRow({
   variant = 'full',
   className,
 }: CartItemRowProps) {
-  const { updateQuantity, removeItem } = useCart()
+  const {
+    updateQuantity,
+    removeItem,
+    saveForLater,
+    restoreFromSaved,
+    removeSavedItem,
+  } = useCart()
   const unitPrice = discountedPrice(item)
   const subtotal = unitPrice * item.quantity
+
+  const isSaved = variant === 'saved'
 
   return (
     <article
       className={cn(
         'flex gap-3 rounded-xl border border-neutral-200 bg-white p-3 shadow-sm sm:p-4',
+        isSaved && 'bg-neutral-100/40',
         className
       )}
     >
@@ -87,6 +100,28 @@ export function CartItemRow({
             </span>
           </div>
         </div>
+
+        {variant === 'full' && (
+          <button
+            type="button"
+            onClick={() => saveForLater(item.publicationId, item.unit)}
+            className="mt-1 inline-flex w-fit items-center gap-1 rounded-md px-1 py-0.5 text-[11px] font-medium text-neutral-500 transition-colors hover:text-primary-700 focus:outline-none focus-visible:underline"
+          >
+            <Bookmark size={12} strokeWidth={1.5} aria-hidden />
+            Guardar para más tarde
+          </button>
+        )}
+
+        {variant === 'saved' && (
+          <button
+            type="button"
+            onClick={() => restoreFromSaved(item.publicationId, item.unit)}
+            className="mt-1 inline-flex w-fit items-center gap-1.5 rounded-md border border-primary-300 bg-white px-2.5 py-1 text-[12px] font-semibold text-primary-300 transition-colors hover:bg-primary-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
+          >
+            <RotateCw size={12} strokeWidth={1.5} aria-hidden />
+            Mover al carrito
+          </button>
+        )}
       </div>
 
       {variant === 'full' && (
@@ -94,6 +129,17 @@ export function CartItemRow({
           type="button"
           onClick={() => removeItem(item.publicationId, item.unit)}
           aria-label={`Quitar ${item.title} del carrito`}
+          className="self-start rounded-lg p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-[#D32F2F] focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
+        >
+          <Trash2 size={16} strokeWidth={1.5} aria-hidden />
+        </button>
+      )}
+
+      {variant === 'saved' && (
+        <button
+          type="button"
+          onClick={() => removeSavedItem(item.publicationId, item.unit)}
+          aria-label={`Quitar ${item.title} de guardados`}
           className="self-start rounded-lg p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-[#D32F2F] focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
         >
           <Trash2 size={16} strokeWidth={1.5} aria-hidden />

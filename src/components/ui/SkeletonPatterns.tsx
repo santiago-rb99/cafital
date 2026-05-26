@@ -171,7 +171,7 @@ export function PageGridSkeleton({
   withHeader?: boolean
 }) {
   return (
-    <div className="bg-neutral-100">
+    <div className="bg-page">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
         {withHeader && (
           <header className="mb-6 flex flex-col gap-2 sm:mb-8">

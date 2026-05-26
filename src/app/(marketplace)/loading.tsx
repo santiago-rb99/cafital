@@ -7,7 +7,7 @@ import {
 
 export default function MarketplaceLoading() {
   return (
-    <div className="bg-neutral-100">
+    <div className="bg-page">
       <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
         {/* Hero */}
         <Skeleton className="aspect-3/1 w-full" rounded="xl" />

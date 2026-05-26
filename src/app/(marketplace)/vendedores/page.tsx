@@ -1,18 +1,15 @@
 import Link from 'next/link';
-import { SearchX, Sparkles, Store } from 'lucide-react';
+import { SearchX, Store } from 'lucide-react';
 
 import { Seller } from '@/types';
-import { CardCarousel } from '@/components/ui/CardCarousel';
 import { EmptyState } from '@/components/ui/EmptyState';
 
-import { SellerCard } from '@/components/seller/SellerCard';
 import { SellersFilterPanel } from '@/components/seller/SellersFilterPanel';
 import { SellersMobileFiltersDrawer } from '@/components/seller/SellersMobileFiltersDrawer';
 import { SellersToolbar } from '@/components/seller/SellersToolbar';
 import { SellersGrid } from '@/components/seller/SellersGrid';
 import {
   buildSellerIndex,
-  pickFeaturedSellers,
   type SellerCommercialIndex,
 } from '@/components/seller/sellerCategoriesUtils';
 import { CERTIFICATION_OPTIONS } from '@/data/schemas/dynamicFilters';
@@ -21,6 +18,8 @@ import {
   parseSellerFilters,
   SellerFiltersState,
 } from '@/components/seller/sellerFiltersState';
+import { HeroBanner } from '@/components/home/HeroBanner';
+import { buildSellerHeroSlides } from '@/components/home/heroSlides';
 
 import { listPublications } from '@/lib/api/publications';
 import { listSellers } from '@/lib/api/users';
@@ -60,19 +59,19 @@ export default async function VendedoresPage({
   // Cuando no hay categoría seleccionada mostramos agrupado;
   // si hay categoría (o búsqueda/filtros) el grid es plano.
 
-  // Destacados: planes Cosecha + Exportación con al menos 1 publicación activa.
-  // Solo se muestran cuando NO hay filtros activos, para que la pantalla
-  // filtrada no se distraiga con elementos comerciales fuera del foco.
-  const featured =
-    activeCount === 0
-      ? pickFeaturedSellers(sellersAll).filter(
-          s => (index[s.id]?.activeCount ?? 0) > 0,
-        )
-      : [];
+  // Hero: solo cuando NO hay filtros activos, para que la pantalla filtrada
+  // se enfoque en los resultados y no en piezas comerciales.
+  const heroSlides = activeCount === 0 ? buildSellerHeroSlides(sellersAll) : [];
 
   return (
-    <div className="bg-neutral-100">
+    <div className="bg-page">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+        {heroSlides.length > 0 && (
+          <div className="mb-8 sm:mb-10">
+            <HeroBanner slides={heroSlides} />
+          </div>
+        )}
+
         <header className="mb-6 flex flex-col gap-1 sm:mb-8">
           <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
             Vendedores
@@ -82,38 +81,6 @@ export default async function VendedoresPage({
             fincas del ecosistema del café en Bolivia.
           </p>
         </header>
-
-        {featured.length > 0 && (
-          <section
-            aria-labelledby="featured-sellers-heading"
-            className="mb-8 flex flex-col gap-4 sm:mb-10"
-          >
-            <div className="flex items-center gap-2">
-              <Sparkles
-                size={18}
-                strokeWidth={1.5}
-                className="text-primary-500"
-                aria-hidden
-              />
-              <h2
-                id="featured-sellers-heading"
-                className="font-serif text-lg font-semibold text-neutral-900 sm:text-xl"
-              >
-                Destacados
-              </h2>
-            </div>
-            <CardCarousel ariaLabel="Vendedores destacados">
-              {featured.map(s => (
-                <SellerCard
-                  key={s.id}
-                  seller={s}
-                  categories={index[s.id]?.categories ?? []}
-                  publicationsCount={index[s.id]?.activeCount}
-                />
-              ))}
-            </CardCarousel>
-          </section>
-        )}
 
         <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8">
           <aside className="hidden lg:block">

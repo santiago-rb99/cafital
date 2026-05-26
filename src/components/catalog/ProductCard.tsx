@@ -3,9 +3,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { Heart, Repeat2 } from 'lucide-react'
+import { Heart, MessageCircle, Repeat2, ShoppingCart } from 'lucide-react'
 import { Publication } from '@/types'
 import { useFavorites } from '@/hooks/useFavorites'
+import { useCart } from '@/contexts/CartContext'
+import { useToast } from '@/contexts/ToastContext'
 import { cn, formatPrice } from '@/lib/utils'
 
 interface ProductCardProps {
@@ -14,6 +16,8 @@ interface ProductCardProps {
   className?: string
 }
 
+const CAFITAL_DEMO_PHONE = '59170000000'
+
 function lowestUnit(pub: Publication) {
   if (!pub.units?.length) return null
   return pub.units.reduce((min, u) => (u.price < min.price ? u : min), pub.units[0])
@@ -21,6 +25,8 @@ function lowestUnit(pub: Publication) {
 
 export function ProductCard({ publication, sellerName, className }: ProductCardProps) {
   const { isPublicationFavorite, togglePublication } = useFavorites()
+  const { addItem } = useCart()
+  const { showSuccess } = useToast()
   const isFav = isPublicationFavorite(publication.id)
 
   const cheapest = useMemo(() => lowestUnit(publication), [publication])
@@ -34,6 +40,34 @@ export function ProductCard({ publication, sellerName, className }: ProductCardP
   const isQuote =
     publication.priceMode === 'quote' || publication.category === 'D'
   const showRecurring = publication.recurringAvailable
+
+  function onAddToCart(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!cheapest) return
+    const qty = cheapest.minQuantity || 1
+    addItem({
+      publicationId: publication.id,
+      sellerId: publication.sellerId,
+      sellerName,
+      title: publication.title,
+      photo: publication.photos[0],
+      unit: cheapest.unit,
+      unitPrice: cheapest.price,
+      quantity: qty,
+      ...(hasDiscount ? { discount: publication.discount } : {}),
+    })
+    showSuccess('Agregado al carrito', publication.title)
+  }
+
+  const whatsappHref = useMemo(() => {
+    const intent =
+      publication.category === 'D'
+        ? `Hola, me interesa la finca "${publication.title}". ¿Podemos coordinar una visita?`
+        : `Hola, me interesa cotizar: "${publication.title}".`
+    const msg = `${intent}\nCafital — ${publication.id}`
+    return `https://wa.me/${CAFITAL_DEMO_PHONE}?text=${encodeURIComponent(msg)}`
+  }, [publication])
 
   return (
     <article
@@ -71,7 +105,7 @@ export function ProductCard({ publication, sellerName, className }: ProductCardP
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col gap-1.5 px-4 pb-3">
+        <div className="flex flex-1 flex-col gap-1.5 px-4">
           <h3 className="line-clamp-2 text-sm font-semibold text-neutral-900 group-hover:text-primary-700">
             {publication.title}
           </h3>
@@ -100,6 +134,31 @@ export function ProductCard({ publication, sellerName, className }: ProductCardP
           </div>
         </div>
       </Link>
+
+      {/* CTA — agregar al carrito o contactar */}
+      <div className="mt-2 px-4 pb-3">
+        {isQuote || !cheapest ? (
+          <Link
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-secondary-300 bg-white px-3 text-[13px] font-semibold text-secondary-300 transition-colors hover:bg-secondary-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
+          >
+            <MessageCircle size={14} strokeWidth={1.5} aria-hidden />
+            {publication.category === 'D' ? 'Coordinar visita' : 'Contactar'}
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={onAddToCart}
+            className="inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-primary-300 px-3 text-[13px] font-semibold text-white transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
+          >
+            <ShoppingCart size={14} strokeWidth={1.5} aria-hidden />
+            Agregar al carrito
+          </button>
+        )}
+      </div>
 
       <button
         type="button"

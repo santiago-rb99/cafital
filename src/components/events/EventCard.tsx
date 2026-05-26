@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, MapPin, Users, Video } from 'lucide-react'
+import { ArrowRight, Calendar, MapPin, Ticket, Users, Video } from 'lucide-react'
 import { CafeEvent } from '@/types'
 import { cn, formatDateShort, formatPrice } from '@/lib/utils'
 
@@ -122,6 +122,40 @@ export function EventCard({ event, organizerName, className }: EventCardProps) {
           </div>
         </div>
       </Link>
+
+      {/* CTA — registrarse / comprar entrada */}
+      <div className="px-4 pb-4">
+        {soldOut ? (
+          <span
+            aria-disabled
+            className="inline-flex h-9 w-full cursor-not-allowed items-center justify-center gap-1.5 rounded-lg border border-neutral-200 bg-neutral-100 px-3 text-[13px] font-semibold text-neutral-300"
+          >
+            Sin cupos disponibles
+          </span>
+        ) : (
+          <Link
+            href={`/eventos/${event.id}`}
+            className={cn(
+              'inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-lg px-3 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100',
+              isFree
+                ? 'bg-primary-300 text-white hover:bg-primary-500'
+                : 'bg-accent-500 text-white hover:bg-accent-700'
+            )}
+          >
+            {isFree ? (
+              <>
+                <Ticket size={14} strokeWidth={1.5} aria-hidden />
+                Inscribirme
+              </>
+            ) : (
+              <>
+                Comprar entrada
+                <ArrowRight size={14} strokeWidth={1.5} aria-hidden />
+              </>
+            )}
+          </Link>
+        )}
+      </div>
     </article>
   )
 }

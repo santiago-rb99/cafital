@@ -217,19 +217,50 @@ export function PurchasePanel({
       {!isQuote && units.length > 0 && (
         <div className="flex flex-col gap-4">
           {units.length > 1 && (
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[13px] font-medium text-neutral-900">
+            <div className="flex flex-col gap-2">
+              <p
+                id="unit-label"
+                className="text-[13px] font-medium text-neutral-900"
+              >
                 Unidad de venta
-              </span>
-              <Select
-                value={String(unitIdx)}
-                onChange={(e) => onUnitChange(e.target.value)}
-                options={units.map((u, i) => ({
-                  value: String(i),
-                  label: `${u.unit} · ${formatPrice(u.price * discountFactor)}`,
-                }))}
-              />
-            </label>
+              </p>
+              <div
+                role="radiogroup"
+                aria-labelledby="unit-label"
+                className="grid grid-cols-2 gap-2 sm:grid-cols-3"
+              >
+                {units.map((u, i) => {
+                  const active = i === unitIdx
+                  return (
+                    <button
+                      key={`${u.unit}-${i}`}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      onClick={() => onUnitChange(String(i))}
+                      className={cn(
+                        'flex flex-col items-start gap-0.5 rounded-lg border px-3 py-2 text-left transition-all focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100',
+                        active
+                          ? 'border-primary-300 bg-primary-50 shadow-xs'
+                          : 'border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50/40'
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'text-[13px] font-semibold',
+                          active ? 'text-primary-700' : 'text-neutral-900'
+                        )}
+                      >
+                        {u.unit}
+                      </span>
+                      <span className="text-xs tabular-nums text-neutral-500">
+                        {formatPrice(u.price * discountFactor)}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
           )}
 
           <div className="flex items-end justify-between gap-3">

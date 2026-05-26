@@ -187,7 +187,7 @@ export function Step6Preview({ data, seller }: Props) {
                     <button
                       type="button"
                       disabled
-                      className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-primary-900"
+                      className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-white"
                       aria-disabled
                     >
                       <ShoppingCart size={16} strokeWidth={1.5} aria-hidden />

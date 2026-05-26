@@ -15,7 +15,12 @@
       "Bash(curl -s -o /dev/null -w \"GET /registro → HTTP %{http_code}\\\\n\" http://localhost:3000/registro)",
       "Bash(curl -s -o /dev/null -w \"GET /login    → HTTP %{http_code}\\\\n\" http://localhost:3000/login)",
       "Bash(curl -s http://localhost:3000/registro)",
-      "Bash(grep -oE \"Soy[^<]{0,30}\")"
+      "Bash(grep -oE \"Soy[^<]{0,30}\")",
+      "Bash(curl -sS -o /dev/null -w \"GET /mi-tienda -> %{http_code}\\\\n\" http://localhost:3000/mi-tienda)",
+      "Bash(curl -sS -o /dev/null -w \"GET /mi-tienda/pedidos -> %{http_code}\\\\n\" http://localhost:3000/mi-tienda/pedidos)",
+      "Bash(curl -sS -o /dev/null -w \"GET /pedido/ord-002 -> %{http_code}\\\\n\" http://localhost:3000/pedido/ord-002)",
+      "Bash(curl -sS -o /dev/null -w \"GET /catalogo -> %{http_code}\\\\n\" http://localhost:3000/catalogo)",
+      "Bash(curl -sf -o /dev/null http://localhost:3000/)"
     ],
     "additionalDirectories": [
       "/Users/santiagorojasblanco/Documents/UCB/cafital/src/components"

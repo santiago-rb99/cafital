@@ -128,7 +128,7 @@ export default function MiTiendaEventosPage() {
         </div>
         <Link
           href="/mi-tienda/eventos/nuevo"
-          className="inline-flex h-10 items-center gap-2 self-start rounded-lg bg-primary-300 px-4 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100 sm:self-auto"
+          className="inline-flex h-10 items-center gap-2 self-start rounded-lg bg-primary-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100 sm:self-auto"
         >
           <Plus size={16} strokeWidth={1.5} aria-hidden />
           Nuevo evento
@@ -182,7 +182,7 @@ export default function MiTiendaEventosPage() {
           action={
             <Link
               href="/mi-tienda/eventos/nuevo"
-              className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
             >
               <Plus size={16} strokeWidth={1.5} aria-hidden />
               Crear evento

@@ -26,12 +26,19 @@ export interface Buyer extends BaseUser {
 export interface Seller extends BaseUser {
   role: 'seller'
   businessName: string
+  /** Asociación / gremio a la que pertenece el vendedor (ej. APROCAFÉ). */
+  association?: string
   logo?: string
   banner?: string
   municipality?: string
   nit?: string
   subscriptionPlan: SubscriptionPlan
   subscriptionExpiry?: string
+  /**
+   * Imagen elegida por el vendedor para publicitarse en el hero de portada,
+   * catálogo y vendedores. Si no existe, el hero cae al `banner`.
+   */
+  heroImage?: string
   about?: {
     mission?: string
     vision?: string
@@ -123,6 +130,15 @@ export interface OrderItem {
   unitPrice: number
 }
 
+export interface ShippingAddress {
+  fullName: string
+  phone: string
+  department: string
+  city: string
+  address: string
+  notes?: string
+}
+
 export interface Order {
   id: string
   buyerId: string
@@ -131,6 +147,8 @@ export interface Order {
   items: OrderItem[]
   total: number
   status: OrderStatus
+  /** Datos de envío que el vendedor necesita para despachar el pedido. */
+  shippingAddress?: ShippingAddress
   createdAt: string
 }
 

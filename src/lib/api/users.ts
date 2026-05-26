@@ -58,5 +58,50 @@ export async function createUser(user: User): Promise<User> {
   return user
 }
 
+export interface UpgradeToSellerInput {
+  businessName: string
+  department?: string
+  municipality?: string
+  description?: string
+  logo?: string
+  banner?: string
+  nit?: string
+}
+
+/**
+ * Convierte un comprador en vendedor manteniendo id, email y createdAt.
+ * Descarta campos exclusivos de comprador (name, avatar) e inicializa
+ * `subscriptionPlan: 'none'`.
+ */
+export async function upgradeBuyerToSeller(
+  buyerId: string,
+  input: UpgradeToSellerInput
+): Promise<Seller> {
+  await delay()
+  const current = allUsers().find((u) => u.id === buyerId)
+  if (!current) throw new ApiError('Usuario no encontrado', 404)
+  if (current.role !== 'buyer') {
+    throw new ApiError('El usuario ya es vendedor', 409)
+  }
+
+  const seller: Seller = {
+    id: current.id,
+    role: 'seller',
+    email: current.email,
+    businessName: input.businessName.trim(),
+    ...(input.department ? { department: input.department } : {}),
+    ...(input.municipality ? { municipality: input.municipality } : {}),
+    ...(input.description ? { description: input.description } : {}),
+    ...(input.logo ? { logo: input.logo } : {}),
+    ...(input.banner ? { banner: input.banner } : {}),
+    ...(input.nit ? { nit: input.nit } : {}),
+    subscriptionPlan: 'none',
+    createdAt: current.createdAt,
+  }
+
+  usersStore.update(buyerId, seller)
+  return seller
+}
+
 // Re-export para conveniencia
 export { mockBuyers, mockSellers }

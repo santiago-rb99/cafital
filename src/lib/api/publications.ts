@@ -20,6 +20,8 @@ function all(): Publication[] {
 export interface PublicationFilters {
   category?: PublicationCategory
   subcategory?: string
+  /** Multi-select de subcategorías (preferido). Si está presente, ignora `category` y `subcategory`. */
+  subcategories?: string[]
   sellerId?: string
   status?: PublicationStatus
   q?: string
@@ -41,8 +43,12 @@ export interface ListPublicationsOptions {
 }
 
 function matchesFilters(pub: Publication, f: PublicationFilters): boolean {
-  if (f.category && pub.category !== f.category) return false
-  if (f.subcategory && pub.subcategory !== f.subcategory) return false
+  if (f.subcategories && f.subcategories.length > 0) {
+    if (!f.subcategories.includes(pub.subcategory)) return false
+  } else {
+    if (f.category && pub.category !== f.category) return false
+    if (f.subcategory && pub.subcategory !== f.subcategory) return false
+  }
   if (f.sellerId && pub.sellerId !== f.sellerId) return false
   if (f.status && pub.status !== f.status) return false
   if (f.department && !pub.coverage.includes(f.department) && !pub.coverage.includes('Todo Bolivia')) {

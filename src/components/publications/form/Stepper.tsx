@@ -40,9 +40,9 @@ export function Stepper({ current, onJump, reachable }: StepperProps) {
                   className={cn(
                     'inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold',
                     done
-                      ? 'bg-primary-300 text-primary-900'
+                      ? 'bg-primary-300 text-white'
                       : active
-                        ? 'bg-primary-300 text-primary-900'
+                        ? 'bg-primary-300 text-white'
                         : 'bg-neutral-100 text-neutral-500'
                   )}
                   aria-hidden
@@ -81,7 +81,7 @@ export function Stepper({ current, onJump, reachable }: StepperProps) {
                   className={cn(
                     'mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
                     done || active
-                      ? 'bg-primary-300 text-primary-900'
+                      ? 'bg-primary-300 text-white'
                       : 'bg-neutral-100 text-neutral-500'
                   )}
                   aria-hidden

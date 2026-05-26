@@ -10,10 +10,10 @@ const TYPE_STYLES: Record<
   { bg: string; border: string; title: string; description: string; Icon: typeof CheckCircle2 }
 > = {
   success: {
-    bg: 'bg-[#F0FFF6]',
-    border: 'border-l-[#27AE60]',
-    title: 'text-[#0D4D26]',
-    description: 'text-[#1E8449]',
+    bg: 'bg-[#F4F7F4]',
+    border: 'border-l-[#314531]',
+    title: 'text-[#0C130C]',
+    description: 'text-[#182618]',
     Icon: CheckCircle2,
   },
   error: {
@@ -24,7 +24,7 @@ const TYPE_STYLES: Record<
     Icon: AlertCircle,
   },
   warning: {
-    bg: 'bg-[#FFFBF0]',
+    bg: 'bg-[#FDEFC2]',
     border: 'border-l-[#C9870E]',
     title: 'text-[#4A2E04]',
     description: 'text-[#8C5A08]',

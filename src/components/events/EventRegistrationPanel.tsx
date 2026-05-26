@@ -8,10 +8,13 @@ import {
   CalendarDays,
   CheckCircle2,
   CreditCard,
+  Info,
   Lock,
+  MapPin,
   Smartphone,
   Ticket,
   Users,
+  Video,
 } from 'lucide-react'
 
 import { CafeEvent } from '@/types'
@@ -21,6 +24,7 @@ import { FormField } from '@/components/ui/FormField'
 import { Input } from '@/components/ui/Input'
 import { QuantitySelector } from '@/components/ui/QuantitySelector'
 import { Spinner } from '@/components/ui/Spinner'
+import { QrPaymentModal } from '@/components/cart/QrPaymentModal'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
 import {
@@ -48,6 +52,7 @@ export function EventRegistrationPanel({ event }: EventRegistrationPanelProps) {
   const [quantity, setQuantity] = useState(1)
   const [submitting, setSubmitting] = useState(false)
   const [showPay, setShowPay] = useState(false)
+  const [showQr, setShowQr] = useState(false)
 
   // Datos del comprador para checkout reducido (cuando es de pago).
   const [fullName, setFullName] = useState('')
@@ -175,6 +180,12 @@ export function EventRegistrationPanel({ event }: EventRegistrationPanelProps) {
   async function onPaySubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!validatePayForm()) return
+    if (payment === 'qr') {
+      // Cierra el formulario y abre el QR. Al confirmar, registra al evento.
+      setShowPay(false)
+      setShowQr(true)
+      return
+    }
     await doRegister(quantity)
   }
 
@@ -199,6 +210,9 @@ export function EventRegistrationPanel({ event }: EventRegistrationPanelProps) {
         aria-label="Inscripción al evento"
         className="flex flex-col gap-5 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm"
       >
+        {/* MODALIDAD (chip destacado arriba del precio) */}
+        <ModalityChip modality={event.modality} city={event.city} />
+
         {/* PRECIO */}
         <div className="flex flex-col gap-1">
           {isFree ? (
@@ -443,12 +457,43 @@ export function EventRegistrationPanel({ event }: EventRegistrationPanelProps) {
               </span>
             </div>
 
+            <div className="flex items-start gap-2 rounded-lg border border-neutral-200 bg-neutral-100 p-3 text-xs leading-relaxed text-neutral-500">
+              <Info
+                size={14}
+                strokeWidth={1.5}
+                className="mt-0.5 shrink-0 text-neutral-500"
+                aria-hidden
+              />
+              <div>
+                <p className="mb-1 font-medium text-neutral-900">
+                  Política de cancelación
+                </p>
+                <p>
+                  Más de 14 días antes: reembolso 100%. Entre 7 y 14 días: 80%.
+                  Entre 48 horas y 7 días: 60%. Menos de 48 horas: sin reembolso.
+                </p>
+              </div>
+            </div>
+
             <p className="inline-flex items-center gap-1.5 text-xs text-neutral-500">
               <Lock size={12} strokeWidth={1.5} aria-hidden />
               Simulación de pago — no se cobrará ningún cargo real.
             </p>
           </form>
         </Modal>
+      )}
+
+      {!isFree && (
+        <QrPaymentModal
+          open={showQr}
+          amount={totalPrice}
+          reference={event.name}
+          onConfirmed={() => {
+            setShowQr(false)
+            void doRegister(quantity)
+          }}
+          onClose={() => setShowQr(false)}
+        />
       )}
     </>
   )
@@ -459,4 +504,42 @@ function formatLimit(dateIso: string): string {
     day: 'numeric',
     month: 'long',
   })
+}
+
+function ModalityChip({
+  modality,
+  city,
+}: {
+  modality: CafeEvent['modality']
+  city?: string
+}) {
+  const config = {
+    presencial: {
+      Icon: MapPin,
+      label: city ? `Presencial · ${city}` : 'Presencial',
+      classes: 'bg-secondary-50 text-secondary-300 border-secondary-100',
+    },
+    virtual: {
+      Icon: Video,
+      label: 'Virtual',
+      classes: 'bg-primary-50 text-primary-700 border-primary-100',
+    },
+    hibrido: {
+      Icon: MapPin,
+      label: city ? `Híbrido · ${city}` : 'Híbrido',
+      classes: 'bg-accent-100 text-accent-900 border-accent-300/40',
+    },
+  } as const
+  const { Icon, label, classes } = config[modality]
+  return (
+    <span
+      className={cn(
+        'inline-flex w-fit items-center gap-1.5 rounded-full border px-3 py-1 text-[12px] font-semibold',
+        classes
+      )}
+    >
+      <Icon size={13} strokeWidth={1.5} aria-hidden />
+      {label}
+    </span>
+  )
 }

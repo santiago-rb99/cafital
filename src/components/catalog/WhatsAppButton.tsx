@@ -81,7 +81,7 @@ export function WhatsAppButton({
   const sizeCls = size === 'lg' ? 'h-12 px-5 text-base' : 'h-10 px-4 text-sm'
   const variantCls =
     variant === 'primary'
-      ? 'bg-primary-300 text-primary-900 hover:bg-primary-500'
+      ? 'bg-primary-300 text-white hover:bg-primary-500'
       : 'bg-white text-neutral-900 border border-neutral-200 hover:border-primary-500 hover:text-primary-700'
 
   const label = intent === 'visitar-finca' ? 'Coordinar visita' : 'Cotizar por WhatsApp'

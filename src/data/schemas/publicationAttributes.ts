@@ -10,7 +10,17 @@
  * los muestra vía AttributeRenderer.
  */
 
-export type AttributeFieldType = 'select' | 'multiselect' | 'text' | 'number'
+export type AttributeFieldType =
+  | 'select'
+  | 'multiselect'
+  | 'text'
+  | 'number'
+  /**
+   * `cascade`: select dependiente del valor de otro atributo. Por ej. la
+   * "Zona de origen" muestra solo las zonas válidas del "Departamento"
+   * actualmente seleccionado.
+   */
+  | 'cascade'
 
 export interface AttributeField {
   /** Clave exacta usada en `Publication.attributes`. */
@@ -29,6 +39,16 @@ export interface AttributeField {
   /** Para `number`. */
   min?: number
   max?: number
+  /** Para `number`: paso del incremento. Por defecto 1. */
+  step?: number
+  /**
+   * Para `cascade`: clave del atributo padre + mapa padre → opciones hijas.
+   * El renderer mostrará un select deshabilitado si el padre no tiene valor.
+   */
+  cascade?: {
+    from: string
+    map: Record<string, string[]>
+  }
 }
 
 /* ─── OPCIONES REUTILIZABLES ────────────────────────────────── */
@@ -55,17 +75,71 @@ const VARIETY_OPTIONS = [
   'Mezcla-Blend',
 ]
 
-const ZONE_OPTIONS = [
-  'Caranavi',
-  'Nor Yungas',
-  'Sud Yungas',
-  'Chapare',
-  'Franz Tamayo',
-  'Inquisivi',
-  'Santa Cruz',
+/** 9 departamentos de Bolivia. */
+export const BOLIVIAN_DEPARTMENTS = [
+  'La Paz',
   'Cochabamba',
+  'Santa Cruz',
   'Tarija',
+  'Chuquisaca',
+  'Beni',
+  'Pando',
+  'Oruro',
+  'Potosí',
 ]
+
+/**
+ * Zonas/municipios cafetaleros por departamento. Solo se listan
+ * departamentos con presencia cafetera relevante en Bolivia.
+ * Si un comprador busca por departamento, debe poder afinar a la zona.
+ */
+export const COFFEE_ZONES_BY_DEPARTMENT: Record<string, string[]> = {
+  'La Paz': [
+    'Caranavi',
+    'Nor Yungas',
+    'Sud Yungas',
+    'Inquisivi',
+    'Franz Tamayo',
+    'Coroico',
+    'Coripata',
+  ],
+  Cochabamba: ['Chapare', 'Carrasco', 'Tiraque', 'Villa Tunari'],
+  'Santa Cruz': [
+    'Samaipata',
+    'Porongo',
+    'Buena Vista',
+    'Vallegrande',
+    'Mairana',
+    'Comarapa',
+  ],
+  Tarija: ['Bermejo', 'Caraparí', 'Entre Ríos'],
+  Beni: ['San Ignacio de Moxos'],
+  Chuquisaca: ['Padilla', 'Monteagudo'],
+}
+
+const COFFEE_DEPARTMENTS = Object.keys(COFFEE_ZONES_BY_DEPARTMENT)
+
+/**
+ * Par de campos para "origen de café": departamento (single select) +
+ * zona/municipio (cascade dependiente del departamento). Se usa donde
+ * antes había un único campo "Zona de origen" plano.
+ */
+function originFields(opts: { required?: boolean } = {}): AttributeField[] {
+  return [
+    {
+      key: 'Departamento de origen',
+      type: 'select',
+      options: COFFEE_DEPARTMENTS,
+      required: opts.required,
+    },
+    {
+      key: 'Zona de origen',
+      type: 'cascade',
+      cascade: { from: 'Departamento de origen', map: COFFEE_ZONES_BY_DEPARTMENT },
+      helper: 'Selecciona primero el departamento.',
+    },
+  ]
+}
 
 const ALTITUDE_OPTIONS = [
   'Hasta 1000 msnm',
@@ -129,7 +203,7 @@ export const PUBLICATION_ATTRIBUTES: Record<string, AttributeField[]> = {
   'A-verde': [
     { key: 'Proceso de beneficiado', type: 'multiselect', options: PROCESS_OPTIONS, required: true },
     { key: 'Variedad botánica', type: 'multiselect', options: VARIETY_OPTIONS, required: true },
-    { key: 'Zona de origen', type: 'select', options: ZONE_OPTIONS, required: true },
+    ...originFields({ required: true }),
     { key: 'Altitud de cultivo', type: 'select', options: ALTITUDE_OPTIONS },
     { key: 'Puntuación SCA', type: 'select', options: SCA_OPTIONS },
     { key: 'Año de cosecha', type: 'text', placeholder: '2025' },
@@ -140,9 +214,18 @@ export const PUBLICATION_ATTRIBUTES: Record<string, AttributeField[]> = {
   'A-pergamino': [
     { key: 'Proceso de beneficiado', type: 'multiselect', options: PROCESS_OPTIONS, required: true },
     { key: 'Variedad botánica', type: 'multiselect', options: VARIETY_OPTIONS, required: true },
-    { key: 'Zona de origen', type: 'select', options: ZONE_OPTIONS, required: true },
+    ...originFields({ required: true }),
     { key: 'Altitud de cultivo', type: 'select', options: ALTITUDE_OPTIONS },
-    { key: 'Humedad %', type: 'number', placeholder: '11', suffix: '%' },
+    {
+      key: 'Humedad %',
+      type: 'number',
+      placeholder: '11.5',
+      suffix: '%',
+      min: 0,
+      max: 20,
+      step: 0.1,
+      helper: 'Café pergamino se comercializa con humedad entre 10% y 12%.',
+    },
     { key: 'Año de cosecha', type: 'text', placeholder: '2025' },
     { key: 'Certificaciones', type: 'multiselect', options: CERTIFICATION_OPTIONS },
   ],
@@ -150,7 +233,7 @@ export const PUBLICATION_ATTRIBUTES: Record<string, AttributeField[]> = {
     { key: 'Nivel de tueste', type: 'select', options: ROAST_OPTIONS, required: true },
     { key: 'Proceso de beneficiado', type: 'multiselect', options: PROCESS_OPTIONS },
     { key: 'Variedad botánica', type: 'multiselect', options: VARIETY_OPTIONS, required: true },
-    { key: 'Zona de origen', type: 'select', options: ZONE_OPTIONS, required: true },
+    ...originFields({ required: true }),
     { key: 'Puntuación SCA', type: 'select', options: SCA_OPTIONS },
     { key: 'Fecha de tueste', type: 'text', placeholder: '12 jul 2026' },
     { key: 'Certificaciones', type: 'multiselect', options: CERTIFICATION_OPTIONS },
@@ -159,7 +242,7 @@ export const PUBLICATION_ATTRIBUTES: Record<string, AttributeField[]> = {
   'A-molido': [
     { key: 'Nivel de tueste', type: 'select', options: ROAST_OPTIONS, required: true },
     { key: 'Variedad botánica', type: 'multiselect', options: VARIETY_OPTIONS },
-    { key: 'Zona de origen', type: 'select', options: ZONE_OPTIONS },
+    ...originFields(),
     { key: 'Tipo de molienda', type: 'select', options: ['Fina (espresso)', 'Media (filtro)', 'Gruesa (prensa francesa)'] },
     { key: 'Fecha de tueste', type: 'text', placeholder: '12 jul 2026' },
     { key: 'Certificaciones', type: 'multiselect', options: CERTIFICATION_OPTIONS },
@@ -171,7 +254,7 @@ export const PUBLICATION_ATTRIBUTES: Record<string, AttributeField[]> = {
   ],
   'A-subproductos': [
     { key: 'Tipo de subproducto', type: 'select', options: ['Cáscara', 'Pulpa', 'Harina', 'Mucílago seco', 'Otros'] },
-    { key: 'Zona de origen', type: 'select', options: ZONE_OPTIONS },
+    ...originFields(),
     { key: 'Aplicación', type: 'text', placeholder: 'Infusiones, abono...' },
   ],
   'A-plantas': [
@@ -272,7 +355,7 @@ export const PUBLICATION_ATTRIBUTES: Record<string, AttributeField[]> = {
   /* ── Categoría C — Servicios Profesionales ──────────────── */
   'C-agro': [
     { key: 'Modalidad', type: 'select', options: SERVICE_MODE_OPTIONS, required: true },
-    { key: 'Departamento donde se realiza', type: 'multiselect', options: ZONE_OPTIONS },
+    { key: 'Departamento donde se realiza', type: 'multiselect', options: BOLIVIAN_DEPARTMENTS },
     { key: 'Duración', type: 'text', placeholder: 'Ej. 1 visita, 6 meses...' },
     { key: 'Idiomas', type: 'multiselect', options: ['Español', 'Inglés', 'Quechua', 'Aymara'] },
   ],
@@ -324,25 +407,25 @@ export const PUBLICATION_ATTRIBUTES: Record<string, AttributeField[]> = {
     { key: 'Variedades sembradas', type: 'multiselect', options: VARIETY_OPTIONS },
     { key: 'Altitud (msnm)', type: 'text', placeholder: '1500–1800' },
     { key: 'Producción anual estimada (qq)', type: 'number', suffix: 'qq' },
-    { key: 'Departamento', type: 'select', options: ZONE_OPTIONS, required: true },
+    { key: 'Departamento', type: 'select', options: BOLIVIAN_DEPARTMENTS, required: true },
     { key: 'Documentación', type: 'multiselect', options: ['Folio Real', 'Plano georreferenciado', 'Certificación orgánica', 'Otros'] },
   ],
   'D-lote': [
     { key: 'Superficie (hectáreas)', type: 'number', suffix: 'ha', required: true },
     { key: 'Aptitud cafetalera', type: 'select', options: ['Alta', 'Media', 'Por evaluar'] },
     { key: 'Altitud (msnm)', type: 'text' },
-    { key: 'Departamento', type: 'select', options: ZONE_OPTIONS, required: true },
+    { key: 'Departamento', type: 'select', options: BOLIVIAN_DEPARTMENTS, required: true },
     { key: 'Acceso a agua', type: 'select', options: ['Pozo', 'Río / ojo de agua', 'Lluvia', 'No identificado'] },
   ],
   'D-infraestructura': [
     { key: 'Superficie (hectáreas)', type: 'number', suffix: 'ha', required: true },
     { key: 'Infraestructura disponible', type: 'multiselect', options: ['Beneficio húmedo', 'Beneficio seco', 'Patio de secado', 'Bodega', 'Vivienda', 'Cuartel de tueste'] },
-    { key: 'Departamento', type: 'select', options: ZONE_OPTIONS, required: true },
+    { key: 'Departamento', type: 'select', options: BOLIVIAN_DEPARTMENTS, required: true },
     { key: 'Estado de infraestructura', type: 'select', options: ['Excelente', 'Buena', 'Requiere mantenimiento'] },
   ],
   'D-terreno': [
     { key: 'Superficie (hectáreas)', type: 'number', suffix: 'ha', required: true },
-    { key: 'Departamento', type: 'select', options: ZONE_OPTIONS, required: true },
+    { key: 'Departamento', type: 'select', options: BOLIVIAN_DEPARTMENTS, required: true },
     { key: 'Tipo de suelo', type: 'text', placeholder: 'Franco-arcilloso, volcánico...' },
     { key: 'Pendiente', type: 'select', options: ['Plano', 'Ondulado', 'Pronunciado'] },
   ],

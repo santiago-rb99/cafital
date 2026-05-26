@@ -1,4 +1,13 @@
-import { Order, RecurringSubscription } from '@/types'
+import { Order, RecurringSubscription, ShippingAddress } from '@/types'
+
+const BUYER_01_ADDRESS: ShippingAddress = {
+  fullName: 'Juan Pérez',
+  phone: '+591 70123456',
+  department: 'La Paz',
+  city: 'La Paz',
+  address: 'Av. 6 de Agosto N° 2456, Zona Sopocachi',
+  notes: 'Edificio Torre Empresarial, piso 4 — recepción hasta las 18:00.',
+}
 
 export const mockOrders: Order[] = [
   {
@@ -18,6 +27,7 @@ export const mockOrders: Order[] = [
     ],
     total: 14400,
     status: 'completed',
+    shippingAddress: BUYER_01_ADDRESS,
     createdAt: '2026-04-10T14:30:00Z',
   },
   {
@@ -45,6 +55,7 @@ export const mockOrders: Order[] = [
     ],
     total: 5150,
     status: 'in_process',
+    shippingAddress: BUYER_01_ADDRESS,
     createdAt: '2026-05-12T09:00:00Z',
   },
   {
@@ -64,6 +75,7 @@ export const mockOrders: Order[] = [
     ],
     total: 900,
     status: 'completed',
+    // Servicio sin envío físico: no hay shippingAddress.
     createdAt: '2026-03-20T11:00:00Z',
   },
   {
@@ -83,6 +95,7 @@ export const mockOrders: Order[] = [
     ],
     total: 16740,
     status: 'pending',
+    shippingAddress: BUYER_01_ADDRESS,
     createdAt: '2026-05-18T16:45:00Z',
   },
   {
@@ -102,6 +115,7 @@ export const mockOrders: Order[] = [
     ],
     total: 3400,
     status: 'completed',
+    shippingAddress: BUYER_01_ADDRESS,
     createdAt: '2026-02-28T10:20:00Z',
   },
 ]

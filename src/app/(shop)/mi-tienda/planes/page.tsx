@@ -159,7 +159,7 @@ function CurrentPlanBanner({
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-primary-300 bg-primary-50 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-start gap-3">
-        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-300 text-primary-900">
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-300 text-white">
           <CalendarClock size={20} strokeWidth={1.5} aria-hidden />
         </span>
         <div className="flex flex-col gap-1">

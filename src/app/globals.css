@@ -5,7 +5,9 @@
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-noto-serif), ui-serif, Georgia, serif;
 
-  /* ── NEUTRAL (estructura y texto) ── */
+  /* ── NEUTRAL (estructura y texto) ──
+     neutral-100 = superficie sutil (gris) para chips, hover y placeholders.
+     Para el FONDO de página usar `bg-page` (crema #FFFBF0). */
   --color-neutral-50: #ffffff;
   --color-neutral-100: #f5f5f5;
   --color-neutral-200: #ebebeb;
@@ -13,13 +15,25 @@
   --color-neutral-500: #737373;
   --color-neutral-900: #262626;
 
-  /* ── PRIMARY (verde — exclusivo: botón primario, iconos activos, toggles, links, focus ring) ── */
-  --color-primary-50: #f0fff6;
-  --color-primary-100: #abecc6;
-  --color-primary-300: #2ecc71;
-  --color-primary-500: #27ae60;
-  --color-primary-700: #1e8449;
-  --color-primary-900: #0d4d26;
+  /* ── PAGE BG (crema cálido) ──
+     Usar como wrapper de página, en `<main>` de shells y skeletons full-page. */
+  --color-page: #fffbf0;
+
+  /* ── PRIMARY (verde bosque #314531 — exclusivo: botón primario, navbar, iconos activos, toggles, links, focus ring) ── */
+  --color-primary-50: #f4f7f4;
+  --color-primary-100: #d4ded4;
+  --color-primary-300: #314531;
+  --color-primary-500: #243324;
+  --color-primary-700: #182618;
+  --color-primary-900: #0c130c;
+
+  /* ── SECONDARY (café #714111 — exclusivo: botones secundarios y algunos iconos) ── */
+  --color-secondary-50: #faf3ec;
+  --color-secondary-100: #f0dcc4;
+  --color-secondary-300: #714111;
+  --color-secondary-500: #5a330d;
+  --color-secondary-700: #3a2208;
+  --color-secondary-900: #1f1204;
 
   /* ── ACCENT (mostaza — exclusivo: checkout y pago) ── */
   --color-accent-50: #fffbf0;
@@ -62,7 +76,7 @@
 
 /* ── BASE ── */
 body {
-  background-color: #f5f5f5;
+  background-color: #fffbf0;
   color: #262626;
   line-height: 1.7;
 }
@@ -82,7 +96,7 @@ h6 {
    `focus:outline-none` de Tailwind sin perder el ring global en botones/links. */
 @layer base {
   *:focus-visible {
-    outline: 3px solid #abecc6;
+    outline: 3px solid #d4ded4;
     outline-offset: 2px;
   }
 }
@@ -189,10 +203,10 @@ h6 {
   left: 0;
   padding: 0.75rem 1rem;
   background: #ffffff;
-  color: #0d4d26;
+  color: #0c130c;
   font-weight: 600;
   font-size: 0.875rem;
-  border: 2px solid #2ecc71;
+  border: 2px solid #314531;
   border-radius: 0 0 0.75rem 0;
   transform: translateY(-100%);
   transition: transform 180ms ease-out;

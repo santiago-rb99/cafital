@@ -266,19 +266,19 @@ function UpgradePrompt() {
       </p>
       <ul role="list" className="flex flex-col gap-1.5 text-sm text-neutral-900">
         <li className="inline-flex items-center gap-2">
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary-300 text-[10px] font-bold text-primary-900">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary-300 text-[10px] font-bold text-white">
             ✓
           </span>
           Vistas totales y promedio
         </li>
         <li className="inline-flex items-center gap-2">
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary-300 text-[10px] font-bold text-primary-900">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary-300 text-[10px] font-bold text-white">
             ✓
           </span>
           Ranking de publicaciones más visitadas
         </li>
         <li className="inline-flex items-center gap-2">
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary-300 text-[10px] font-bold text-primary-900">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary-300 text-[10px] font-bold text-white">
             ✓
           </span>
           Bloque &ldquo;Sobre nosotros&rdquo; + carrusel hasta 10 imágenes

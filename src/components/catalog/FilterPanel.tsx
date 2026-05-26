@@ -1,8 +1,8 @@
 'use client'
 
-import { useMemo, useTransition } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { Eraser } from 'lucide-react'
+import { ChevronDown, Eraser } from 'lucide-react'
 
 import { Category, PublicationCategory } from '@/types'
 import { Checkbox } from '@/components/ui/Checkbox'
@@ -16,6 +16,7 @@ import {
   getDynamicFiltersForSubcategory,
 } from '@/data/schemas/dynamicFilters'
 import { DEPARTMENTS } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 
 import {
   buildCatalogSearchParams,
@@ -48,17 +49,42 @@ export function FilterPanel({
   const pathname = usePathname()
   const [pending, startTransition] = useTransition()
 
+  // Filtros dinámicos: solo cuando hay exactamente UNA subcategoría seleccionada.
   const dynamicFilters: DynamicFilter[] = useMemo(
-    () => getDynamicFiltersForSubcategory(state.subcategory),
-    [state.subcategory]
+    () =>
+      state.subcategories.length === 1
+        ? getDynamicFiltersForSubcategory(state.subcategories[0])
+        : [],
+    [state.subcategories]
   )
 
-  const subcategories = useMemo(() => {
-    if (!state.category) return []
-    return categories.find((c) => c.id === state.category)?.subcategories ?? []
-  }, [state.category, categories])
-
   const activeCount = countActiveFilters(state)
+  const selectedByCategory = useMemo(() => {
+    const map = new Map<PublicationCategory, number>()
+    for (const subId of state.subcategories) {
+      for (const cat of categories) {
+        if (cat.subcategories.some((s) => s.id === subId)) {
+          map.set(cat.id, (map.get(cat.id) ?? 0) + 1)
+          break
+        }
+      }
+    }
+    return map
+  }, [state.subcategories, categories])
+
+  // Categorías con subcategorías seleccionadas se abren por defecto.
+  const [openCategories, setOpenCategories] = useState<Set<PublicationCategory>>(
+    () => new Set(selectedByCategory.keys())
+  )
+
+  function toggleCategoryOpen(cat: PublicationCategory) {
+    setOpenCategories((prev) => {
+      const next = new Set(prev)
+      if (next.has(cat)) next.delete(cat)
+      else next.add(cat)
+      return next
+    })
+  }
 
   function navigate(next: Partial<CatalogFiltersState>) {
     const merged: CatalogFiltersState = {
@@ -74,14 +100,14 @@ export function FilterPanel({
     })
   }
 
-  function setCategory(cat: PublicationCategory | null) {
-    // Cambiar categoría resetea subcategoría y filtros dinámicos.
-    navigate({ category: cat, subcategory: null, dynamic: {} })
-  }
-
-  function setSubcategory(sub: string | null) {
-    // Cambiar subcategoría resetea filtros dinámicos.
-    navigate({ subcategory: sub, dynamic: {} })
+  function toggleSubcategory(subId: string) {
+    const has = state.subcategories.includes(subId)
+    const nextSubs = has
+      ? state.subcategories.filter((s) => s !== subId)
+      : [...state.subcategories, subId]
+    // Si pasamos a 0 o ≥2 subcategorías, los filtros dinámicos pierden sentido.
+    const nextDynamic = nextSubs.length === 1 ? state.dynamic : {}
+    navigate({ subcategories: nextSubs, dynamic: nextDynamic })
   }
 
   function toggleCertification(slug: string) {
@@ -139,53 +165,67 @@ export function FilterPanel({
       </div>
 
       <div className="flex flex-col gap-6">
-        {/* CATEGORÍA */}
-        <Group title="Categoría">
+        {/* CATEGORÍAS — acordeón jerárquico */}
+        <Group title="Categorías">
           <ul className="flex flex-col gap-1">
-            <li>
-              <CategoryRow
-                label="Todas las categorías"
-                active={state.category === null}
-                onClick={() => setCategory(null)}
-              />
-            </li>
-            {(['A', 'B', 'C', 'D'] as const).map((cat) => (
-              <li key={cat}>
-                <CategoryRow
-                  label={CATEGORY_LABEL[cat]}
-                  active={state.category === cat}
-                  onClick={() => setCategory(cat)}
-                />
-              </li>
-            ))}
+            {(['A', 'B', 'C', 'D'] as const).map((catId) => {
+              const cat = categories.find((c) => c.id === catId)
+              if (!cat) return null
+              const isOpen = openCategories.has(catId)
+              const count = selectedByCategory.get(catId) ?? 0
+              return (
+                <li key={catId} className="rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => toggleCategoryOpen(catId)}
+                    aria-expanded={isOpen}
+                    aria-controls={`subcategories-${catId}`}
+                    className={cn(
+                      'flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100',
+                      count > 0
+                        ? 'bg-primary-50 text-primary-700'
+                        : 'text-neutral-900 hover:bg-neutral-100'
+                    )}
+                  >
+                    <span className="flex items-center gap-2 text-sm font-medium">
+                      {CATEGORY_LABEL[catId]}
+                      {count > 0 && (
+                        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-300 px-1.5 text-[11px] font-semibold text-white">
+                          {count}
+                        </span>
+                      )}
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      strokeWidth={1.5}
+                      className={cn(
+                        'shrink-0 text-neutral-500 transition-transform',
+                        isOpen && 'rotate-180'
+                      )}
+                      aria-hidden
+                    />
+                  </button>
+                  {isOpen && (
+                    <ul
+                      id={`subcategories-${catId}`}
+                      className="mt-1 flex flex-col gap-1 border-l border-neutral-200 pl-4"
+                    >
+                      {cat.subcategories.map((sub) => (
+                        <li key={sub.id} className="py-1">
+                          <Checkbox
+                            label={sub.name}
+                            checked={state.subcategories.includes(sub.id)}
+                            onChange={() => toggleSubcategory(sub.id)}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              )
+            })}
           </ul>
         </Group>
-
-        {/* SUBCATEGORÍA */}
-        {state.category && subcategories.length > 0 && (
-          <Group title="Subcategoría">
-            <ul className="flex flex-col gap-1">
-              <li>
-                <CategoryRow
-                  label="Todas"
-                  active={state.subcategory === null}
-                  onClick={() => setSubcategory(null)}
-                  size="sm"
-                />
-              </li>
-              {subcategories.map((sub) => (
-                <li key={sub.id}>
-                  <CategoryRow
-                    label={sub.name}
-                    active={state.subcategory === sub.id}
-                    onClick={() => setSubcategory(sub.id)}
-                    size="sm"
-                  />
-                </li>
-              ))}
-            </ul>
-          </Group>
-        )}
 
         {/* PRECIO */}
         <Group title="Rango de precio (Bs.)">
@@ -245,22 +285,36 @@ export function FilterPanel({
           </ul>
         </Group>
 
-        {/* DINÁMICOS POR SUBCATEGORÍA */}
-        {dynamicFilters.map((filter) => (
-          <Group key={filter.key} title={filter.label}>
-            <ul className="flex flex-col gap-2">
-              {filter.options.map((opt) => (
-                <li key={opt.value}>
-                  <Checkbox
-                    label={opt.label}
-                    checked={(state.dynamic[filter.key] ?? []).includes(opt.value)}
-                    onChange={() => toggleDynamic(filter.key, opt.value)}
-                  />
-                </li>
-              ))}
-            </ul>
-          </Group>
-        ))}
+        {/* DINÁMICOS POR SUBCATEGORÍA — solo si hay UNA subcategoría seleccionada */}
+        {dynamicFilters.length > 0 && (
+          <>
+            <p className="text-[11px] uppercase tracking-wider text-neutral-500">
+              Filtros específicos
+            </p>
+            {dynamicFilters.map((filter) => (
+              <Group key={filter.key} title={filter.label}>
+                <ul className="flex flex-col gap-2">
+                  {filter.options.map((opt) => (
+                    <li key={opt.value}>
+                      <Checkbox
+                        label={opt.label}
+                        checked={(state.dynamic[filter.key] ?? []).includes(opt.value)}
+                        onChange={() => toggleDynamic(filter.key, opt.value)}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </Group>
+            ))}
+          </>
+        )}
+
+        {state.subcategories.length >= 2 && (
+          <p className="rounded-lg border border-dashed border-neutral-200 px-3 py-2 text-xs leading-relaxed text-neutral-500">
+            Los filtros específicos (proceso, variedad, etc.) aparecen al
+            seleccionar una sola subcategoría.
+          </p>
+        )}
 
         {/* Limpiar (acción terciaria abajo, redundante con la del header pero útil al final del scroll) */}
         {activeCount > 0 && (
@@ -295,34 +349,5 @@ function Group({
       </p>
       {children}
     </div>
-  )
-}
-
-function CategoryRow({
-  label,
-  active,
-  onClick,
-  size = 'md',
-}: {
-  label: string
-  active: boolean
-  onClick: () => void
-  size?: 'sm' | 'md'
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={
-        'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100 ' +
-        (active
-          ? 'bg-primary-50 text-primary-700 font-medium'
-          : 'text-neutral-900 hover:bg-neutral-100') +
-        (size === 'sm' ? ' text-[13px]' : ' text-sm')
-      }
-    >
-      <span>{label}</span>
-    </button>
   )
 }

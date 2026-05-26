@@ -23,7 +23,7 @@ export default function NotFound() {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
               href="/"
-              className="inline-flex h-10 items-center justify-center rounded-lg bg-primary-300 px-5 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500"
+              className="inline-flex h-10 items-center justify-center rounded-lg bg-primary-300 px-5 text-sm font-semibold text-white transition-colors hover:bg-primary-500"
             >
               Volver al inicio
             </Link>

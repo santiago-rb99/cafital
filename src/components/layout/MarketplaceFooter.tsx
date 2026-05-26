@@ -22,11 +22,11 @@ const COLUMNS: Array<{
     ],
   },
   {
-    title: 'Vendedores',
+    title: 'Cafital',
     links: [
+      { href: '/sobre-nosotros', label: 'Sobre nosotros' },
       { href: '/mi-tienda', label: 'Mi Tienda' },
-      { href: '/suscripciones/planes', label: 'Planes de suscripción' },
-      { href: '/registro?role=seller', label: 'Vender en Cafital' },
+      { href: '/mi-tienda/planes', label: 'Planes de suscripción' },
     ],
   },
 ]

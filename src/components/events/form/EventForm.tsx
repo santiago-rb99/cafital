@@ -105,7 +105,7 @@ const EMPTY: FormState = {
 
 export function EventForm({ initial }: Props) {
   const { user } = useAuth()
-  const { showSuccess, showError } = useToast()
+  const { showSuccess, showError, showInfo } = useToast()
   const router = useRouter()
   const isEditing = Boolean(initial)
   const seller = (user?.role === 'seller' ? (user as Seller) : null) ?? null
@@ -121,6 +121,35 @@ export function EventForm({ initial }: Props) {
 
   function patch(p: Partial<FormState>) {
     setData((prev) => ({ ...prev, ...p }))
+  }
+
+  /**
+   * Si el usuario eligió una hora de fin anterior a la de inicio (típicamente
+   * porque tipeó "9:00" pensando en "9 PM" después de un inicio a las 13:00),
+   * intentamos sumarle 12 horas. Si así supera al inicio, aplicamos el ajuste
+   * automático y avisamos. Si no, dejamos el valor original tal cual y será
+   * la validación final quien marque el error.
+   */
+  function onEndTimeChange(rawEnd: string) {
+    const start = data.startTime
+    if (!start || !rawEnd || rawEnd > start) {
+      patch({ endTime: rawEnd })
+      return
+    }
+    const [h, m] = rawEnd.split(':').map((n) => Number(n))
+    if (Number.isFinite(h) && Number.isFinite(m) && h < 12) {
+      const corrected = `${String(h + 12).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+      if (corrected > start) {
+        patch({ endTime: corrected })
+        if (errors.endTime) setErrors((prev) => ({ ...prev, endTime: undefined }))
+        showInfo(
+          'Hora ajustada',
+          `${rawEnd} es anterior al inicio (${start}). La interpretamos como ${corrected}.`
+        )
+        return
+      }
+    }
+    patch({ endTime: rawEnd })
   }
 
   function pickImage(e: ChangeEvent<HTMLInputElement>) {
@@ -162,6 +191,9 @@ export function EventForm({ initial }: Props) {
 
     if (!data.date) next.date = 'Elige la fecha del evento.'
     if (!data.startTime) next.startTime = 'Elige la hora de inicio.'
+    // La corrección automática AM→PM en `onEndTimeChange` cubre los casos
+    // ambiguos. Si después de eso el end sigue siendo <= start, mostramos
+    // un error claro para que el vendedor lo arregle a mano.
     if (data.endTime && data.startTime && data.endTime <= data.startTime)
       next.endTime = 'La hora de fin debe ser posterior a la de inicio.'
 
@@ -485,10 +517,19 @@ export function EventForm({ initial }: Props) {
             />
           </FormField>
 
-          <FormField label="Hora fin" optional error={errors.endTime}>
+          <FormField
+            label="Hora fin"
+            optional
+            error={errors.endTime}
+            helper={
+              !errors.endTime
+                ? 'Si está antes del inicio, asumimos PM y ajustamos.'
+                : undefined
+            }
+          >
             <TimePicker
               value={data.endTime}
-              onChange={(e) => patch({ endTime: e.target.value })}
+              onChange={(e) => onEndTimeChange(e.target.value)}
             />
           </FormField>
 

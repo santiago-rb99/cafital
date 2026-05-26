@@ -62,7 +62,7 @@ export function Step2Subcategory({ data, onChange, errors }: Props) {
                 </span>
                 {active && (
                   <span
-                    className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-300 text-primary-900"
+                    className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-300 text-white"
                     aria-hidden
                   >
                     <Check size={13} strokeWidth={2.5} />

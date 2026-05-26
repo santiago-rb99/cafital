@@ -30,7 +30,7 @@ interface NavItem {
 const SHOP_NAV: NavItem[] = [
   {
     href: '/mi-tienda',
-    label: 'Dashboard',
+    label: 'Resumen',
     icon: <LayoutDashboard size={18} strokeWidth={1.5} />,
     matchExact: true,
   },
@@ -97,6 +97,14 @@ export function ShopSidebar({ onNavigate }: ShopSidebarProps) {
               <p className="truncate text-sm font-semibold text-neutral-900">
                 {seller.businessName}
               </p>
+              {seller.association && (
+                <p
+                  className="mt-0.5 truncate text-[11px] text-neutral-500"
+                  title={seller.association}
+                >
+                  {seller.association}
+                </p>
+              )}
               {subscriptionPlan !== 'none' ? (
                 <Badge variant="primary" className="mt-1">
                   {subscriptionLabel(subscriptionPlan)}
@@ -124,7 +132,7 @@ export function ShopSidebar({ onNavigate }: ShopSidebarProps) {
         <Link
           href="/mi-tienda/publicaciones/nueva"
           onClick={onNavigate}
-          className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500"
+          className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-500"
         >
           <Plus size={18} strokeWidth={1.5} />
           Nueva publicación

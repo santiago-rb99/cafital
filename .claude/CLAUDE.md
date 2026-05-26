@@ -338,13 +338,14 @@ Al generar pantallas, invocar las skills relevantes. Todas alineadas al mismo de
 Siempre usar el comando `/design-system` al generar cualquier pantalla para tener las especificaciones exactas.
 
 **Reglas críticas de diseño:**
-- Fondo de página: siempre `#F5F5F5` (bg-neutral-100)
+- Fondo de página: siempre `#FFFBF0` crema cálido (bg-neutral-100)
 - Contenedores: siempre `#FFFFFF` + `border 1px solid #EBEBEB` + sombra correspondiente
 - Sin gradientes, sin texturas decorativas
 - Diseño flat — profundidad solo con bordes y sombras
-- Verde (`#2ECC71`) SOLO en: botón primario, iconos activos, toggles activos, links activos, focus ring
-- Mostaza (`#C9870E`) SOLO en: botón de checkout/pago
-- 90% de la superficie debe ser blanca/gris neutro — el color es funcional, no decorativo
+- Verde bosque (`#314531`) SOLO en: botón primario, navbar, iconos activos, toggles activos, links activos, focus ring (token: `primary-300`)
+- Café (`#714111`) SOLO en: botones secundarios y algunos iconos (token: `secondary-300`)
+- Mostaza (`#C9870E`) SOLO en: botón de checkout/pago (token: `accent-500`)
+- 90% de la superficie debe ser blanca/crema — el color es funcional, no decorativo
 
 **Tipografía:**
 - Títulos: Noto Serif (400/700)

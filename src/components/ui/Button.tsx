@@ -15,9 +15,9 @@ export type ButtonSize = 'sm' | 'md' | 'lg'
 
 const VARIANT_STYLES: Record<ButtonVariant, string> = {
   primary:
-    'bg-primary-300 text-primary-900 hover:bg-primary-500 active:bg-primary-700 disabled:bg-neutral-200 disabled:text-neutral-300',
+    'bg-primary-300 text-white hover:bg-primary-500 active:bg-primary-700 disabled:bg-neutral-200 disabled:text-neutral-300',
   secondary:
-    'bg-white text-primary-500 border border-primary-500 hover:bg-primary-50 disabled:bg-neutral-100 disabled:text-neutral-300 disabled:border-neutral-200',
+    'bg-white text-secondary-300 border border-secondary-300 hover:bg-secondary-50 disabled:bg-neutral-100 disabled:text-neutral-300 disabled:border-neutral-200',
   checkout:
     'bg-accent-500 text-white hover:bg-accent-700 disabled:bg-neutral-200 disabled:text-neutral-300',
   destructive:
@@ -25,7 +25,7 @@ const VARIANT_STYLES: Record<ButtonVariant, string> = {
   ghost:
     'bg-transparent text-neutral-900 hover:bg-neutral-100 disabled:text-neutral-300',
   link:
-    'bg-transparent text-primary-500 hover:text-primary-700 underline-offset-2 hover:underline disabled:text-neutral-300 px-0 h-auto',
+    'bg-transparent text-primary-300 hover:text-primary-500 underline-offset-2 hover:underline disabled:text-neutral-300 px-0 h-auto',
 }
 
 const SIZE_STYLES: Record<ButtonSize, string> = {

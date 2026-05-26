@@ -40,7 +40,7 @@ export default function GlobalError({ error, unstable_retry }: GlobalErrorProps)
             <button
               type="button"
               onClick={() => unstable_retry()}
-              className="mt-8 inline-flex h-10 items-center justify-center rounded-lg bg-primary-300 px-5 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500"
+              className="mt-8 inline-flex h-10 items-center justify-center rounded-lg bg-primary-300 px-5 text-sm font-semibold text-white transition-colors hover:bg-primary-500"
             >
               Reintentar
             </button>

@@ -45,44 +45,40 @@ export default async function PublicacionPage({
 
   const sellersById = new Map(sellers.map((s) => [s.id, s]))
 
-  const [moreFromSeller, sameSubcategory] = await Promise.all([
-    listPublications({
-      filters: { sellerId: seller.id },
-      sort: 'recent',
-    }),
-    listPublications({
-      filters: { subcategory: publication.subcategory },
-      sort: 'recent',
-    }),
-  ])
+  // Productos similares: misma subcategoría, otro vendedor, ordenados por
+  // afinidad de atributos (más atributos coincidentes = más arriba).
+  const sameSubcategory = await listPublications({
+    filters: { subcategory: publication.subcategory },
+    sort: 'recent',
+  })
 
-  const moreFromSellerList = moreFromSeller
-    .filter((p) => p.id !== publication.id)
-    .slice(0, 8)
-  const sameSubcategoryList = sameSubcategory
+  const similarPublications = sameSubcategory
     .filter(
       (p) => p.id !== publication.id && p.sellerId !== publication.sellerId
     )
+    .map((p) => ({ p, score: attributeAffinity(publication, p) }))
+    .sort((a, b) => b.score - a.score)
     .slice(0, 8)
+    .map((entry) => entry.p)
 
   const isLand = publication.category === 'D'
   const isVerifiedSeller = seller.subscriptionPlan !== 'none'
 
   return (
-    <div className="bg-neutral-100">
+    <div className="bg-page">
       <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <Breadcrumbs
           items={[
             { label: 'Catálogo', href: '/catalogo' },
             {
               label: CATEGORY_LABEL[publication.category],
-              href: `/catalogo?category=${publication.category}`,
+              href: '/catalogo',
             },
             ...(subcategory
               ? [
                   {
                     label: subcategory.name,
-                    href: `/catalogo?category=${publication.category}&subcategory=${subcategory.id}`,
+                    href: `/catalogo?subs=${subcategory.id}`,
                   },
                 ]
               : []),
@@ -192,9 +188,12 @@ export default async function PublicacionPage({
                   id="specs-heading"
                   className="mb-5 font-serif text-lg font-semibold text-neutral-900"
                 >
-                  Especificaciones
+                  Características principales
                 </h2>
-                <AttributeRenderer attributes={publication.attributes} />
+                <AttributeRenderer
+                  attributes={publication.attributes}
+                  variant="table"
+                />
               </section>
             )}
 
@@ -204,22 +203,13 @@ export default async function PublicacionPage({
           <div aria-hidden className="hidden md:block" />
         </div>
 
-        {(moreFromSellerList.length > 0 || sameSubcategoryList.length > 0) && (
-          <div className="mt-12 flex flex-col gap-10">
-            {moreFromSellerList.length > 0 && (
-              <RelatedPublications
-                title={`Más de ${seller.businessName}`}
-                publications={moreFromSellerList}
-                sellersById={sellersById}
-              />
-            )}
-            {!isLand && sameSubcategoryList.length > 0 && (
-              <RelatedPublications
-                title="Productos relacionados"
-                publications={sameSubcategoryList}
-                sellersById={sellersById}
-              />
-            )}
+        {!isLand && similarPublications.length > 0 && (
+          <div className="mt-12">
+            <RelatedPublications
+              title="Productos similares"
+              publications={similarPublications}
+              sellersById={sellersById}
+            />
           </div>
         )}
       </div>
@@ -299,4 +289,29 @@ function SellerSummary({
       </div>
     </section>
   )
+}
+
+/**
+ * Puntaje simple de afinidad entre dos publicaciones a partir de cuántos
+ * atributos coinciden (por valor o por intersección de listas). Mayor =
+ * más similar. No requiere conocer el esquema: opera sobre el bag de
+ * atributos que la publicación ya trae.
+ */
+function attributeAffinity(a: Publication, b: Publication): number {
+  let score = 0
+  for (const [key, av] of Object.entries(a.attributes)) {
+    const bv = b.attributes[key]
+    if (bv === undefined) continue
+    if (Array.isArray(av) && Array.isArray(bv)) {
+      // Intersección: 1 punto por cada valor compartido.
+      score += av.filter((x) => bv.includes(x)).length
+    } else if (Array.isArray(av) && typeof bv === 'string') {
+      if (av.includes(bv)) score += 1
+    } else if (typeof av === 'string' && Array.isArray(bv)) {
+      if (bv.includes(av)) score += 1
+    } else if (av === bv) {
+      score += 1
+    }
+  }
+  return score
 }

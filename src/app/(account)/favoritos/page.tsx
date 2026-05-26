@@ -73,7 +73,7 @@ export default function FavoritosPage() {
   const loadingSellers = sellers === null
 
   return (
-    <div className="bg-neutral-100">
+    <div className="bg-page">
       <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <Breadcrumbs items={[{ label: 'Favoritos' }]} className="mb-5" />
 
@@ -120,7 +120,7 @@ export default function FavoritosPage() {
               action={
                 <Link
                   href="/catalogo"
-                  className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
+                  className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
                 >
                   Ir al catálogo
                 </Link>
@@ -156,7 +156,7 @@ export default function FavoritosPage() {
             action={
               <Link
                 href="/vendedores"
-                className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
+                className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
               >
                 Ver vendedores
               </Link>

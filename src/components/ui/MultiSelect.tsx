@@ -176,7 +176,7 @@ export function MultiSelect({
                         )}
                       >
                         {checked && (
-                          <Check size={12} strokeWidth={2.5} className="text-primary-900" />
+                          <Check size={12} strokeWidth={2.5} className="text-white" />
                         )}
                       </span>
                       <span className="flex-1">{opt.label}</span>

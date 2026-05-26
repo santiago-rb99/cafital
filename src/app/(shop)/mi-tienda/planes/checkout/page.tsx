@@ -113,7 +113,7 @@ function CheckoutInner() {
         </p>
         <Link
           href="/mi-tienda/planes"
-          className="inline-flex h-10 w-fit items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500"
+          className="inline-flex h-10 w-fit items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-500"
         >
           <ArrowLeft size={16} strokeWidth={1.5} aria-hidden />
           Volver a Planes
@@ -126,7 +126,7 @@ function CheckoutInner() {
   if (done) {
     return (
       <div className="mx-auto flex max-w-xl flex-col items-center gap-4 rounded-2xl border border-primary-300 bg-primary-50 p-8 text-center shadow-sm sm:p-10">
-        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary-300 text-primary-900">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary-300 text-white">
           <CheckCircle2 size={28} strokeWidth={1.5} aria-hidden />
         </span>
         <h1 className="font-serif text-2xl font-semibold text-neutral-900">
@@ -145,7 +145,7 @@ function CheckoutInner() {
           </Link>
           <Link
             href="/mi-tienda"
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500"
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-500"
           >
             Ir a Mi Tienda
           </Link>
@@ -394,7 +394,7 @@ function CheckoutInner() {
             {plan.highlights.map((h) => (
               <li key={h} className="flex items-start gap-2">
                 <span
-                  className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary-300 text-primary-900"
+                  className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary-300 text-white"
                   aria-hidden
                 >
                   <Check size={11} strokeWidth={2.5} />

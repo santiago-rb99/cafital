@@ -4,7 +4,7 @@ import { ReactNode, useState, useTransition } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { X } from 'lucide-react'
 
-import { Category, PublicationCategory } from '@/types'
+import { Category } from '@/types'
 import { SearchBar } from '@/components/ui/SearchBar'
 import { Select } from '@/components/ui/Select'
 import {
@@ -25,13 +25,6 @@ interface CatalogToolbarProps {
   resultCount: number
   /** Renderizado a la izquierda del select de orden (típicamente el trigger del drawer en mobile). */
   mobileFiltersTrigger?: ReactNode
-}
-
-const CATEGORY_LABEL: Record<PublicationCategory, string> = {
-  A: 'Café e insumos',
-  B: 'Maquinaria y equipo',
-  C: 'Servicios profesionales',
-  D: 'Terrenos y fincas',
 }
 
 interface ChipDef {
@@ -154,25 +147,29 @@ function buildActiveChips(
 ): ChipDef[] {
   const chips: ChipDef[] = []
 
-  if (state.category) {
-    chips.push({
-      key: `cat:${state.category}`,
-      label: CATEGORY_LABEL[state.category],
-      // Quitar categoría también quita subcategoría y filtros dinámicos.
-      remove: () => ({ category: null, subcategory: null, dynamic: {} }),
-    })
-  }
-
-  if (state.subcategory) {
-    const cat = categories.find((c) => c.id === state.category)
-    const sub = cat?.subcategories.find((s) => s.id === state.subcategory)
-    if (sub) {
-      chips.push({
-        key: `sub:${state.subcategory}`,
-        label: sub.name,
-        remove: () => ({ subcategory: null, dynamic: {} }),
-      })
+  // Subcategorías seleccionadas (cada una es su propia chip).
+  for (const subId of state.subcategories) {
+    let subName: string | undefined
+    for (const cat of categories) {
+      const sub = cat.subcategories.find((s) => s.id === subId)
+      if (sub) {
+        subName = sub.name
+        break
+      }
     }
+    if (!subName) continue
+    chips.push({
+      key: `sub:${subId}`,
+      label: subName,
+      remove: () => {
+        const next = state.subcategories.filter((s) => s !== subId)
+        // Si quedamos con 0 o ≥2 subcategorías, los dinámicos dejan de aplicar.
+        return {
+          subcategories: next,
+          dynamic: next.length === 1 ? state.dynamic : {},
+        }
+      },
+    })
   }
 
   if (state.department) {
@@ -209,7 +206,10 @@ function buildActiveChips(
     })
   }
 
-  const dynamicFilters = getDynamicFiltersForSubcategory(state.subcategory)
+  const dynamicFilters =
+    state.subcategories.length === 1
+      ? getDynamicFiltersForSubcategory(state.subcategories[0])
+      : []
   for (const filter of dynamicFilters) {
     const slugs = state.dynamic[filter.key] ?? []
     for (const slug of slugs) {

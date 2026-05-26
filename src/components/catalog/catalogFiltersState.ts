@@ -1,9 +1,14 @@
 /**
  * URL ↔ State para el catálogo. La URL es la fuente de verdad — este módulo
  * sólo provee tipos y helpers para parsear searchParams y reconstruirlos.
+ *
+ * Modelo de filtrado por categoría/subcategoría:
+ * - El usuario marca subcategorías directamente (multi-select).
+ * - La categoría se infiere de los IDs seleccionados (prefix `A-`, `B-`...).
+ * - Si se selecciona exactamente UNA subcategoría, se muestran sus filtros
+ *   dinámicos (proceso, variedad, etc.).
  */
 
-import { PublicationCategory } from '@/types'
 import {
   CERTIFICATION_OPTIONS,
   DynamicFilter,
@@ -13,8 +18,7 @@ import {
 export type CatalogSort = 'recent' | 'priceAsc' | 'priceDesc' | 'popular'
 
 export interface CatalogFiltersState {
-  category: PublicationCategory | null
-  subcategory: string | null
+  subcategories: string[]
   q: string
   department: string | null
   minPrice: number | null
@@ -32,11 +36,9 @@ export const SORT_OPTIONS: { value: CatalogSort; label: string }[] = [
   { value: 'popular', label: 'Más vistos' },
 ]
 
-const VALID_CATEGORIES: PublicationCategory[] = ['A', 'B', 'C', 'D']
 const VALID_SORTS: CatalogSort[] = ['recent', 'priceAsc', 'priceDesc', 'popular']
 const STATIC_KEYS = new Set([
-  'category',
-  'subcategory',
+  'subs',
   'q',
   'dept',
   'min',
@@ -72,22 +74,23 @@ function parseInt0(value: string | null): number | null {
 }
 
 export function parseCatalogFilters(params: ParamsLike): CatalogFiltersState {
-  const rawCategory = getOne(params, 'category')
-  const category =
-    rawCategory && (VALID_CATEGORIES as string[]).includes(rawCategory)
-      ? (rawCategory as PublicationCategory)
-      : null
-
-  const subcategory = getOne(params, 'subcategory')
-  // Si subcategoría no pertenece a la categoría elegida, ignorarla.
-  // (Validación blanda — la UI puede mostrar mensaje "sin resultados".)
+  // Compat: aceptar `subs` (nuevo) o `subcategory` (legacy single)
+  let subcategories = getList(params, 'subs')
+  if (subcategories.length === 0) {
+    const legacy = getOne(params, 'subcategory')
+    if (legacy) subcategories = [legacy]
+  }
 
   const rawSort = getOne(params, 'sort')
   const sort = (VALID_SORTS as string[]).includes(rawSort ?? '')
     ? (rawSort as CatalogSort)
     : 'recent'
 
-  const dynamicFilters = getDynamicFiltersForSubcategory(subcategory)
+  // Filtros dinámicos solo aplican cuando hay exactamente una subcategoría.
+  const dynamicFilters =
+    subcategories.length === 1
+      ? getDynamicFiltersForSubcategory(subcategories[0])
+      : []
   const dynamic: Record<string, string[]> = {}
   for (const f of dynamicFilters) {
     const values = getList(params, f.key)
@@ -95,8 +98,7 @@ export function parseCatalogFilters(params: ParamsLike): CatalogFiltersState {
   }
 
   return {
-    category,
-    subcategory: subcategory || null,
+    subcategories,
     q: (getOne(params, 'q') ?? '').trim(),
     department: getOne(params, 'dept'),
     minPrice: parseInt0(getOne(params, 'min')),
@@ -112,8 +114,9 @@ export function buildCatalogSearchParams(
   state: Partial<CatalogFiltersState>
 ): URLSearchParams {
   const out = new URLSearchParams()
-  if (state.category) out.set('category', state.category)
-  if (state.subcategory) out.set('subcategory', state.subcategory)
+  if (state.subcategories && state.subcategories.length) {
+    out.set('subs', state.subcategories.join(','))
+  }
   if (state.q) out.set('q', state.q)
   if (state.department) out.set('dept', state.department)
   if (state.minPrice != null) out.set('min', String(state.minPrice))
@@ -152,8 +155,7 @@ export function toApiFilters(
   }
 
   return {
-    category: state.category ?? undefined,
-    subcategory: state.subcategory ?? undefined,
+    subcategories: state.subcategories.length ? state.subcategories : undefined,
     q: state.q || undefined,
     department: state.department ?? undefined,
     minPrice: state.minPrice ?? undefined,
@@ -165,9 +167,7 @@ export function toApiFilters(
 
 /** Cuenta cuántos filtros activos hay (ignora orden y búsqueda). */
 export function countActiveFilters(state: CatalogFiltersState): number {
-  let n = 0
-  if (state.category) n++
-  if (state.subcategory) n++
+  let n = state.subcategories.length
   if (state.department) n++
   if (state.minPrice != null) n++
   if (state.maxPrice != null) n++

@@ -64,7 +64,7 @@ export default function EditarPublicacionPage({
         action={
           <Link
             href="/mi-tienda/publicaciones"
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100"
           >
             <ArrowLeft size={16} strokeWidth={1.5} aria-hidden />
             Volver a Mis publicaciones

@@ -1,4 +1,4 @@
-import { CartItem, Order, OrderItem, OrderStatus } from '@/types'
+import { CartItem, Order, OrderItem, OrderStatus, ShippingAddress } from '@/types'
 import { mockOrders } from '@/data/mock/orders'
 import { ApiError, delay, generateApiId, makeStore } from './_client'
 import { getUser } from './users'
@@ -34,7 +34,8 @@ export async function getOrder(id: string): Promise<Order | null> {
  */
 export async function createOrdersFromCart(
   buyerId: string,
-  items: CartItem[]
+  items: CartItem[],
+  shippingAddress?: ShippingAddress
 ): Promise<Order[]> {
   await delay(500)
   if (items.length === 0) throw new ApiError('El carrito está vacío', 400)
@@ -68,6 +69,7 @@ export async function createOrdersFromCart(
       items: orderItems,
       total,
       status: 'pending',
+      ...(shippingAddress ? { shippingAddress } : {}),
       createdAt: new Date().toISOString(),
     }
     store.create(order)

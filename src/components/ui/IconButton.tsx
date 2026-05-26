@@ -10,7 +10,7 @@ const VARIANT_STYLES: Record<IconButtonVariant, string> = {
   outline:
     'bg-white text-neutral-900 border border-neutral-200 hover:bg-neutral-100 hover:border-neutral-300 disabled:text-neutral-300',
   solid:
-    'bg-primary-300 text-primary-900 hover:bg-primary-500 disabled:bg-neutral-200 disabled:text-neutral-300',
+    'bg-primary-300 text-white hover:bg-primary-500 disabled:bg-neutral-200 disabled:text-neutral-300',
   destructive:
     'bg-transparent text-[#D32F2F] hover:bg-[#FDEAEA] disabled:text-neutral-300',
 }

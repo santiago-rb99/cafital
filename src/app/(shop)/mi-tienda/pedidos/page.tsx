@@ -5,6 +5,8 @@ import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { ShoppingBag } from 'lucide-react'
 
+import { Check } from 'lucide-react'
+
 import { Order, OrderStatus } from '@/types'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -207,6 +209,9 @@ function PedidosInner() {
                     Productos
                   </th>
                   <th scope="col" className="px-5 py-3">
+                    Cliente
+                  </th>
+                  <th scope="col" className="px-5 py-3">
                     Fecha
                   </th>
                   <th scope="col" className="px-5 py-3 text-right">
@@ -250,6 +255,23 @@ function PedidosInner() {
                         </div>
                       </div>
                     </td>
+                    <td className="px-5 py-4">
+                      {order.shippingAddress ? (
+                        <div className="flex flex-col">
+                          <p className="line-clamp-1 text-sm font-medium text-neutral-900">
+                            {order.shippingAddress.fullName}
+                          </p>
+                          <p className="line-clamp-1 text-xs text-neutral-500">
+                            {order.shippingAddress.city},{' '}
+                            {order.shippingAddress.department}
+                          </p>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-neutral-300">
+                          Sin envío físico
+                        </span>
+                      )}
+                    </td>
                     <td className="px-5 py-4 text-sm text-neutral-500">
                       {formatDateShort(order.createdAt)}
                     </td>
@@ -259,6 +281,17 @@ function PedidosInner() {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2">
                         <OrderStatusBadge status={order.status} size="sm" />
+                        {order.status === 'pending' && (
+                          <button
+                            type="button"
+                            onClick={() => onStatusChange(order, 'in_process')}
+                            disabled={updatingId === order.id}
+                            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary-300 px-3 text-[13px] font-semibold text-white transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <Check size={14} strokeWidth={2} aria-hidden />
+                            Confirmar
+                          </button>
+                        )}
                         <Select
                           value={order.status}
                           onChange={(e) =>
@@ -336,6 +369,20 @@ function OrderMobileCard({
         </div>
       )}
 
+      {order.shippingAddress && (
+        <div className="flex flex-col gap-0.5">
+          <span className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+            Cliente
+          </span>
+          <p className="text-sm font-medium text-neutral-900">
+            {order.shippingAddress.fullName}
+          </p>
+          <p className="text-xs text-neutral-500">
+            {order.shippingAddress.address}, {order.shippingAddress.city}
+          </p>
+        </div>
+      )}
+
       <div className="flex items-end justify-between gap-3">
         <div className="flex flex-col">
           <span className="text-xs text-neutral-500">Total</span>
@@ -356,6 +403,18 @@ function OrderMobileCard({
           />
         </div>
       </div>
+
+      {order.status === 'pending' && (
+        <button
+          type="button"
+          onClick={() => onChangeStatus('in_process')}
+          disabled={updating}
+          className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-500 focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Check size={16} strokeWidth={2} aria-hidden />
+          Confirmar pedido
+        </button>
+      )}
     </article>
   )
 }

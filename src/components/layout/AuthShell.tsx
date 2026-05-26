@@ -3,7 +3,7 @@ import { ReactNode } from 'react'
 
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
-    <div className="flex flex-1 flex-col bg-neutral-100">
+    <div className="flex flex-1 flex-col bg-page">
       <header className="px-4 py-6 sm:px-6 lg:px-8">
         <Link
           href="/"

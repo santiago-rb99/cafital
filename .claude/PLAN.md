@@ -1,196 +1,183 @@
-# Plan de Implementación — Cafital
+# Plan — Publicidad y Previsualización de Perfil
 
-> Roadmap completo del prototipo. Marcar `[x]` cada entregable al completarlo para llevar progreso entre sesiones.
+Dos features nuevas para vendedores en Mi Tienda:
 
----
-
-## Arquitectura general
-
-### Capa de "API simulada"
-Crear `src/lib/api/*.ts` con funciones async (auth, publications, events, orders, etc.) que leen de `data/mock/` con `setTimeout` para simular latencia. Esto deja el swap a backend real como un cambio aislado.
-
-### Persistencia local
-Cualquier mutación (crear publicación, pedido, inscripción, etc.) se guarda en `localStorage` además del mock en memoria, así sobrevive a refresh. Patrón: cada slice tiene una key (`cafital_publications_overrides`, `cafital_orders_overrides`, ...) que se fusiona con el mock estático al cargar.
-
-### Routing por grupos
-```
-app/
-  (auth)/login, registro, onboarding/[role]
-  (marketplace)/page, catalogo, publicacion/[id], vendedor/[id], eventos, carrito, checkout, pedido/[id]
-  (account)/perfil, pedidos, favoritos, suscripciones
-  (shop)/mi-tienda/{dashboard, pedidos, publicaciones, publicaciones/nueva, publicaciones/[id]/editar, eventos, eventos/nuevo, ajustes, planes, estadisticas}
-```
-Tres layouts: auth minimal · marketplace con header global · shop con sidebar.
-
-### Server vs Client Components
-Por defecto Server. `'use client'` solo en interactividad real (forms, modales, dropdowns, drawers, contextos). Filtros del catálogo → estado en URL (`useSearchParams`) para deep-linking.
-
-### Decisiones pendientes
-- [x] Confirmar React Hook Form + Zod para forms
-- [x] Configurar `remotePatterns` en `next.config.ts` para `picsum.photos` y `i.pravatar.cc`
+1. **Sección Publicidad** (`/mi-tienda/publicidad`) — solo habilitada con plan activo. Gestiona hero, galería, promoción de eventos y muestra apariciones consumidas/restantes.
+2. **Previsualización de perfil con edición inline** (`/mi-tienda/perfil`) — renderiza el perfil público tal cual lo verá el comprador, con overlays de edición (lápiz, +, basura) sobre cada bloque editable.
 
 ---
 
-## Inventario de componentes reutilizables
+## Decisiones tomadas
 
-### Átomos (`components/ui/`)
-Button · IconButton · Input · Textarea · NumberInput · Select · MultiSelect · Toggle · Checkbox · Radio · Badge · Avatar · Tooltip · Tabs · Chip · Spinner · Skeleton · ToastRenderer
-
-### Moléculas (`components/ui/`)
-FormField (label + control + helper/error) · ImageDropzone · ImageGallery · QuantitySelector · PriceTag · CurrencyInput · DatePicker · TimePicker · SearchBar · Breadcrumbs · Pagination · EmptyState · ConfirmDialog · Modal · Drawer
-
-### Cards (compuestos, uno por feature)
-- **ProductCard** — variantes: con precio / bajo cotización / con descuento; badges descuento y recurrente; botón favorito
-- **EventCard** — fecha, modalidad, cupos, precio o "Gratuito"
-- **SellerCard** — destacados / grid de vendedores
-- **OrderCard** — historial de pedidos
-- **RecurringSubscriptionCard** — mis suscripciones
-- **PlanCard** — 3 planes con CTA contratar
-
-### Específicos por dominio
-- **FilterPanel** — sidebar desktop + drawer mobile, filtros estáticos + dinámicos por subcategoría
-- **AttributeRenderer** — renderiza atributos del esquema de cada subcategoría (multi/single select, número, texto)
-- **WhatsAppButton** — mensaje preformateado con producto/precio
-- **HeroBanner** — carousel rotativo de vendedores con plan
-- **SubscriptionBadge** — Semilla / Cosecha / Exportación
-- **MarketplaceHeader** — search + cart + favoritos + user menu
-- **ShopSidebar** — nav de Mi Tienda
+- **Alcance Publicidad**: completo — hero (imagen + copy + ubicación: home/catálogo/vendedores), galería del perfil (límite por plan), promoción de eventos en `EventsHeroBanner`, y contador de apariciones consumidas/restantes este mes.
+- **Ubicación preview**: ruta nueva `/mi-tienda/perfil` con entrada propia en `ShopSidebar`. Reusa los componentes de `/vendedor/[id]` y monta overlays de edición encima.
 
 ---
 
-## FASES
+## Reglas de negocio por plan
 
-### F1 — Foundation
-**Objetivo**: cimiento sobre el que se construye todo.
+| Plan         | Hero appearances/mes | Galería extra | Hero eventos | Bloque "Sobre nosotros" |
+|--------------|----------------------|---------------|--------------|-------------------------|
+| Sin plan     | 0 (Publicidad bloqueada — upsell) | — | — | — |
+| Semilla      | 1                    | —             | ✓            | —                       |
+| Cosecha      | 3                    | hasta 5       | ✓            | —                       |
+| Exportación  | 7                    | hasta 10      | ✓ prioridad  | ✓                       |
 
-- [x] UI kit completo (átomos + moléculas)
-- [x] 3 layouts (auth, marketplace, shop)
-- [x] MarketplaceHeader + Footer
-- [x] ShopSidebar
-- [x] ToastRenderer enganchado al `ToastContext`
-- [x] `lib/api/*` con stubs para todos los recursos
-- [x] Page 404 + error boundary
-
-### F2 — Auth simulado y onboarding
-**Objetivo**: simular registro y sesión completa.
-
-- [x] Login (con lista visible de usuarios mock para acceso rápido)
-- [x] Registro: paso 1 elegir rol → paso 2 datos
-- [x] Onboarding del comprador (perfil personal)
-- [x] Onboarding del vendedor (datos del negocio + logo + banner)
-- [x] Logout
-- [x] Guards de ruta (`(account)` y `(shop)` requieren sesión; `(shop)` requiere rol seller)
-
-### F3 — Marketplace browsing (corazón del producto)
-**Objetivo**: navegar y descubrir.
-
-- [x] **Home**: hero banner rotativo, grid de categorías, vendedores destacados, publicaciones recientes, próximos eventos
-- [x] **Catálogo**:
-  - [x] FilterPanel con filtros estáticos (categoría, subcategoría, precio, departamento, certificaciones)
-  - [x] Filtros dinámicos según subcategoría
-  - [x] Búsqueda + ordenamiento
-  - [x] URL como source of truth de filtros
-- [x] **Página de publicación**:
-  - [x] ImageGallery con lightbox
-  - [x] Selector de unidad + QuantitySelector
-  - [x] Toggle de compra recurrente (frecuencia + cantidad)
-  - [x] WhatsAppButton para cotizar
-  - [x] AttributeRenderer
-  - [x] Tarjeta del vendedor
-  - [x] "Productos relacionados"
-- [x] **Perfil público de vendedor**: 4 variantes (sin plan, Semilla, Cosecha, Exportación)
-
-### F4 — Carrito y checkout
-**Objetivo**: cerrar el flujo de compra directa.
-
-- [x] Cart drawer (acceso desde header)
-- [x] Cart page completa
-- [x] Checkout (datos de envío + resumen + simulación de pago)
-- [x] Confirmación de pedido
-- [x] Detalle de pedido
-- [x] Reglas: cat D y bajo cotización **no** entran al carrito, solo WhatsApp
-
-### F5 — Cuenta del comprador
-**Objetivo**: cerrar experiencia del comprador.
-
-- [x] Perfil + edición de datos
-- [x] Mis pedidos (historial con filtros por estado + detalle)
-- [x] Favoritos (tabs Publicaciones / Vendedores)
-- [x] Mis suscripciones recurrentes (pausar, editar frecuencia/cantidad, cancelar)
-- [x] Ajustes generales
-
-### F6 — Eventos
-**Objetivo**: ver e inscribirse.
-
-- [x] Lista con filtros (tipo, modalidad, departamento, fecha)
-- [x] Detalle de evento
-- [x] Inscripción gratuita (confirmación inmediata)
-- [x] Inscripción con precio (checkout reducido)
-- [x] Mis inscripciones en perfil del comprador
-
-### F7 — Mi Tienda (vista vendedor)
-**Objetivo**: gestión operativa del vendedor.
-
-- [x] Dashboard (ventas del período, pedidos recibidos, publicaciones activas)
-- [x] Lista de pedidos recibidos + cambio de estado
-- [x] Tabla "Mis publicaciones" con acciones (editar, pausar, eliminar)
-- [x] Tabla "Mis eventos"
-- [x] Ajustes de tienda (datos del negocio, logo, banner)
-
-### F8 — Formulario de publicación (pieza más compleja)
-**Objetivo**: crear/editar publicaciones de las 4 categorías.
-
-- [x] Esquema de atributos por subcategoría en `data/schemas/`
-- [x] Multi-step:
-  - [x] Paso 1: Categoría
-  - [x] Paso 2: Subcategoría
-  - [x] Paso 3: Info base (fotos via Dropzone, título, descripción, variantes, video)
-  - [x] Paso 4: Atributos dinámicos
-  - [x] Paso 5: Precio y logística (toggle precio/cotización, tabla repetible de unidades, cobertura, inventario, descuento, recurrente)
-  - [x] Paso 6: Vista previa idéntica a la página real
-  - [x] Paso 7: Publicar / Guardar borrador
-- [x] Formulario de evento (single step)
-
-### F9 — Suscripciones del vendedor
-**Objetivo**: diferenciación visual y de capacidades por plan.
-
-- [x] Página de planes (3 PlanCards con comparativa)
-- [x] Flujo de contratación simulado
-- [x] Plan actual visible en Mi Tienda + cambiar plan
-- [x] Bloque "Sobre nosotros" editable (solo Exportación)
-- [x] Carrusel de imágenes adicionales (Cosecha hasta 5, Exportación hasta 10)
-- [x] Estadísticas (solo Exportación): visitas por publicación
-- [x] Perfil público y home reflejan privilegios del plan
-
-### F10 — Polish y QA
-**Objetivo**: calidad demo-ready.
-
-- [x] Loading states con Skeletons coherentes
-- [x] Empty states pulidos en todas las listas
-- [x] Error states (404 + generic error boundary)
-- [x] Revisión mobile completa (header colapsable, filtros como drawer, tablas responsive)
-- [x] Microanimaciones (fade-in cards, slide drawer, toast)
-- [x] A11y básico (focus visible, ARIA en modales/drawers, navegación por teclado)
+Reglas de UI:
+- Si plan = `none`: la entrada "Publicidad" del sidebar lleva a un estado vacío con CTA "Ver planes".
+- La galería extra solo aparece en preview/publicidad si `plan.carouselMaxImages > 0`.
+- El bloque "Sobre nosotros" inline-editable solo en plan Exportación.
 
 ---
 
-## Dependencias entre fases
+## Fase 1 — Datos y API
+
+Base mock para que ambas features tengan estado real persistido en memoria.
+
+- [ ] **Tipos** (`src/types/index.ts`):
+  - [ ] Añadir `Seller.heroCopy?: string` (copy promocional, máx. ~140 chars).
+  - [ ] Añadir `Seller.promotedEventId?: string` (id del evento elegido para `EventsHeroBanner`).
+  - [ ] Añadir `Seller.adAppearancesUsed?: number` (apariciones consumidas en el mes en curso).
+  - [ ] Añadir `Seller.adAppearancesPeriodStart?: string` (ISO; sirve para resetear el contador mes a mes — los mocks lo dejan en el 1 del mes actual).
+- [ ] **Mock data** (`src/data/mock/users.ts`):
+  - [ ] Rellenar los 3 sellers con plan (`semilla`, `cosecha`, `exportacion`) con `heroCopy`, `promotedEventId`, `adAppearancesUsed` realistas (ej. semilla 1/1 ya consumido, cosecha 2/3, exportación 4/7).
+- [ ] **API capa mock** (`src/lib/api/users.ts` + nuevo `src/lib/api/advertising.ts`):
+  - [ ] `getAdvertising(sellerId)` → devuelve `{ heroImage, heroCopy, profileImages, promotedEventId, adAppearancesUsed, adAppearancesMax, galleryMax }`.
+  - [ ] `updateHero(sellerId, { heroImage, heroCopy })`.
+  - [ ] `addProfileImage(sellerId, url)` con validación contra `galleryMax`.
+  - [ ] `removeProfileImage(sellerId, url)`.
+  - [ ] `reorderProfileImages(sellerId, urls[])`.
+  - [ ] `setPromotedEvent(sellerId, eventId | null)` (valida que el evento sea del seller y esté `active`).
+  - [ ] `updateAbout(sellerId, { mission, vision, history })` — solo Exportación.
+- [ ] **`heroSlides.ts`** (`src/components/home/heroSlides.ts`):
+  - [ ] `buildSellerHeroSlides` — usar `seller.heroCopy ?? seller.description` para el copy del slide.
+  - [ ] `buildEventHeroSlides` — priorizar eventos cuyo `event.id === organizer.promotedEventId`.
+
+---
+
+## Fase 2 — Sección Publicidad (`/mi-tienda/publicidad`)
+
+Ruta nueva bajo `src/app/(shop)/mi-tienda/publicidad/page.tsx`. Cliente.
+
+- [ ] **Sidebar** (`src/components/layout/ShopSidebar.tsx`):
+  - [ ] Añadir item `{ href: '/mi-tienda/publicidad', label: 'Publicidad', icon: <Megaphone /> }`.
+  - [ ] No filtrar por plan — siempre visible; la página gestiona el estado bloqueado.
+- [ ] **Estado bloqueado (plan `none`)**:
+  - [ ] `EmptyState` con ícono `Lock`, copy "La Publicidad está disponible desde el plan Semilla" y CTA "Ver planes" → `/mi-tienda/planes`.
+- [ ] **Layout de la página** (con plan activo):
+  - [ ] Header: título "Publicidad" + subtítulo con plan actual + badge de apariciones (`{used}/{max} este mes`).
+  - [ ] Tres secciones en `Tabs` o stack vertical:
+    1. **Hero promocional** (todos los planes con suscripción).
+    2. **Galería del perfil** (solo si `galleryMax > 0`).
+    3. **Promocionar evento** (todos los planes con suscripción).
+- [ ] **Sección Hero promocional** (`src/components/shop/advertising/HeroAdvertisingCard.tsx`):
+  - [ ] Preview del slide (reusar look del `HeroBanner` a media escala).
+  - [ ] `ImageDropzone` para `heroImage` (16:10 recomendado, 1400x900).
+  - [ ] `Textarea` para `heroCopy` (máx. 140 chars, contador en vivo).
+  - [ ] Botón "Guardar cambios" + toast de éxito.
+  - [ ] Nota: "Se mostrará en Home, Catálogo y Vendedores cuando seas elegido en el rotador."
+- [ ] **Sección Galería del perfil** (`src/components/shop/advertising/GalleryManagerCard.tsx`):
+  - [ ] Grid de thumbnails con contador `{usadas}/{galleryMax}`.
+  - [ ] Cada thumb con overlay de acciones: `Eye` (preview lightbox), `Trash` (eliminar con `ConfirmDialog`), `GripVertical` (drag para reordenar).
+  - [ ] Tile "+" al final si `usadas < galleryMax` → abre `ImageDropzone`.
+  - [ ] Si `galleryMax === 0`: card bloqueada con upsell "Disponible desde el plan Cosecha".
+- [ ] **Sección Promocionar evento** (`src/components/shop/advertising/PromotedEventCard.tsx`):
+  - [ ] `Select` con los eventos del vendedor cuyo `status === 'active'` y fecha `>= hoy`.
+  - [ ] Opción "Ninguno" para desactivar.
+  - [ ] Preview de la tarjeta del evento elegido + texto "Aparecerá en el hero de Eventos según tu prioridad de plan."
+  - [ ] Empty state si no hay eventos activos: CTA "Crear evento" → `/mi-tienda/eventos/nuevo`.
+- [ ] **Contador de apariciones** (header de la página):
+  - [ ] Barra de progreso `{used}/{max}` con tooltip explicando reseteo mensual.
+  - [ ] Si `used === max`: badge `warning` "Cupo agotado este mes".
+
+---
+
+## Fase 3 — Previsualización de perfil (`/mi-tienda/perfil`)
+
+Ruta nueva bajo `src/app/(shop)/mi-tienda/perfil/page.tsx`. Cliente.
+
+Concepto: renderiza una réplica del perfil público (`/vendedor/[id]`) y monta encima un sistema de overlays con iconos para editar cada bloque sin salir de la página.
+
+- [ ] **Sidebar** (`src/components/layout/ShopSidebar.tsx`):
+  - [ ] Añadir item `{ href: '/mi-tienda/perfil', label: 'Mi perfil público', icon: <UserCircle /> }` arriba de "Publicidad".
+- [ ] **Componente shell** (`src/components/shop/profile-preview/ProfilePreviewShell.tsx`):
+  - [ ] Toolbar superior: pill "Vista previa" + toggle "Ver como visitante" (oculta todos los overlays para ver la versión limpia).
+  - [ ] Renderiza los bloques del perfil reusando `SellerProfileHero`, `SellerAbout`, `SellerImageCarousel`, `ProductCard`, `EventCard`.
+- [ ] **EditableBlock** (`src/components/shop/profile-preview/EditableBlock.tsx`):
+  - [ ] Wrapper que recibe `children` y renderiza un botón flotante (`IconButton` con `Pencil`) en esquina superior derecha cuando se hace hover/focus.
+  - [ ] Borde punteado sutil al hover (token `primary-100`).
+  - [ ] Click → abre el `Modal` o `Drawer` del editor correspondiente.
+- [ ] **Bloques editables y sus editores**:
+  - [ ] **Logo + banner + nombre + descripción** → `BusinessIdentityEditor` (reuso de los campos de `/mi-tienda/ajustes`).
+  - [ ] **Hero / imagen promocional** (si plan ≥ semilla) → atajo al editor de la sección Hero de Publicidad (modal embebido).
+  - [ ] **Galería de imágenes extra** (si `galleryMax > 0`):
+    - [ ] Cada imagen del carrusel envuelta con overlay: `Pencil` (reemplazar), `Trash` (eliminar con confirm).
+    - [ ] Tile "+" al final del carrusel si `usadas < galleryMax`.
+    - [ ] Si la galería está vacía pero el plan la permite: placeholder "Aún no has subido imágenes — añade hasta {galleryMax}" con CTA.
+  - [ ] **Sobre nosotros** (solo Exportación) → `AboutEditor` con tres `Textarea` (misión, visión, historia).
+  - [ ] **Publicaciones activas**: no editable inline; ícono `ExternalLink` que lleva a `/mi-tienda/publicaciones`.
+  - [ ] **Próximos eventos**: no editable inline; ícono `ExternalLink` a `/mi-tienda/eventos`.
+- [ ] **Persistencia**:
+  - [ ] Cada editor llama al endpoint correspondiente de la Fase 1 y actualiza el `AuthContext` (`updateUser`).
+  - [ ] Toast de éxito por cambio guardado.
+- [ ] **Vacíos por plan**:
+  - [ ] Plan `none`: la página igual carga, pero los bloques premium (hero, galería, sobre nosotros) se renderizan como placeholders con CTA "Disponible desde el plan X" en lugar del lápiz.
+
+---
+
+## Fase 4 — Integración y pulido
+
+- [ ] **Home / Catálogo / Vendedores** (`src/app/(marketplace)/page.tsx`, `catalogo/page.tsx`, `vendedores/page.tsx`):
+  - [ ] Confirmar que `HeroBanner` ahora consume `heroCopy` cuando existe.
+- [ ] **Home / Eventos** (`src/app/(marketplace)/page.tsx`, `eventos/page.tsx`):
+  - [ ] Confirmar que `EventsHeroBanner` prioriza eventos `promotedEventId`.
+- [ ] **`DevSessionSwitcher`**: verificar que los 3 sellers suscritos muestran datos realistas en /publicidad y /perfil al cambiar de sesión.
+- [ ] **Accesibilidad** (skill `/wcag-checklist`):
+  - [ ] Botones de editar con `aria-label="Editar {bloque}"`.
+  - [ ] Confirm dialogs en cada eliminar.
+  - [ ] Foco visible en overlays.
+- [ ] **Responsive** (skill `/responsive-patterns`):
+  - [ ] Overlays de edición en móvil: tap = abre menú de acciones (en vez de hover).
+  - [ ] Grid de galería: 2 col móvil, 3-4 col desktop.
+- [ ] **Craft** (skill `/frontend-design`):
+  - [ ] Transición suave al mostrar overlays (fade + scale).
+  - [ ] Estado loading en los editores con `Spinner`.
+
+---
+
+## Componentes nuevos (resumen)
 
 ```
-F1 ─┬─> F2 ─┬─> F3 ──> F4 ──> F5
-    │       │
-    │       └─> F6
-    │
-    └────────> F7 ──> F8 ──> F9 ──> F10
+src/components/shop/
+  advertising/
+    HeroAdvertisingCard.tsx
+    GalleryManagerCard.tsx
+    PromotedEventCard.tsx
+    AppearancesProgress.tsx
+  profile-preview/
+    ProfilePreviewShell.tsx
+    EditableBlock.tsx
+    BusinessIdentityEditor.tsx
+    AboutEditor.tsx
+    GalleryInlineEditor.tsx
 ```
 
-F3 y F7 pueden avanzar en paralelo apenas F1+F2 estén listas. F8 depende fuerte de F1 (forms, dropzone) y F3 (la vista previa = página de publicación).
+```
+src/app/(shop)/mi-tienda/
+  publicidad/page.tsx
+  perfil/page.tsx
+```
+
+```
+src/lib/api/
+  advertising.ts
+```
 
 ---
 
-## Cómo retomar en una nueva sesión
+## Orden sugerido de implementación
 
-1. Abrir el proyecto (`CLAUDE.md` se auto-carga con el contexto del negocio).
-2. Pedirle a Claude: **"Lee `.claude/PLAN.md` y dime en qué fase estamos"**.
-3. Continuar desde el primer checkbox sin marcar.
-4. Al terminar entregables, marcar `[x]` aquí.
+1. Fase 1 completa (tipos + mocks + API) — sin esto las dos UIs no tienen estado.
+2. Fase 2 (Publicidad) — más autocontenida.
+3. Fase 3 (Preview de perfil) — reusa el editor de hero/galería de la Fase 2 vía modal.
+4. Fase 4 — integración + pulido + a11y + responsive.

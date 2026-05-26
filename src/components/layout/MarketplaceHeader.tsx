@@ -10,13 +10,16 @@ import {
   useState,
 } from 'react'
 import {
+  Calendar,
   ChevronDown,
   Heart,
+  LayoutDashboard,
   LogOut,
   Menu,
   Package,
   Repeat,
   Settings,
+  ShoppingBag,
   ShoppingCart,
   Sparkles,
   Store,
@@ -32,11 +35,14 @@ import { cn, subscriptionLabel } from '@/lib/utils'
 import { logout as apiLogout } from '@/lib/api/auth'
 import { CartDrawer } from '@/components/cart/CartDrawer'
 
-const NAV_LINKS = [
+const PUBLIC_NAV_LINKS = [
   { href: '/catalogo', label: 'Catálogo' },
   { href: '/eventos', label: 'Eventos' },
   { href: '/vendedores', label: 'Vendedores' },
+  { href: '/sobre-nosotros', label: 'Sobre nosotros' },
 ] as const
+
+const SHOP_LINK = { href: '/mi-tienda', label: 'Mi Tienda' } as const
 
 export function MarketplaceHeader() {
   const router = useRouter()
@@ -115,22 +121,24 @@ export function MarketplaceHeader() {
     user?.role === 'seller' ? (user as Seller).logo : user?.avatar
 
   return (
-    <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white">
+    <header className="sticky top-0 z-40 bg-primary-300 text-white shadow-sm">
+      {/* FILA 1 — logo + búsqueda + acciones */}
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:gap-6 lg:px-8">
         {/* Logo */}
         <Link
           href="/"
-          className="shrink-0 font-serif text-xl font-bold text-neutral-900"
+          className="shrink-0 font-serif text-xl font-bold text-white"
           aria-label="Cafital — Inicio"
         >
           Cafital
         </Link>
 
-        {/* Search — desktop */}
+        {/* Search — md+. Sin max-width: ocupa todo el espacio disponible
+            entre el logo y el bloque de acciones para llenar la fila. */}
         <form
           onSubmit={submitSearch}
           role="search"
-          className="hidden flex-1 md:flex md:max-w-xl"
+          className="hidden flex-1 md:flex"
         >
           <SearchBar
             value={query}
@@ -141,19 +149,6 @@ export function MarketplaceHeader() {
 
         {/* Spacer when search hidden */}
         <div className="flex-1 md:hidden" />
-
-        {/* Nav links — lg+ only */}
-        <nav className="hidden items-center gap-1 lg:flex">
-          {NAV_LINKS.map((link) => (
-            <NavLink
-              key={link.href}
-              href={link.href}
-              active={isActive(pathname, link.href)}
-            >
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
 
         {/* Icon actions — md+ */}
         <div className="hidden items-center gap-1 md:flex">
@@ -167,6 +162,7 @@ export function MarketplaceHeader() {
             onClick={() => router.push('/favoritos')}
             icon={<Heart size={20} strokeWidth={1.5} />}
             label="Mis favoritos"
+            className="text-white hover:bg-white/10 hover:text-white"
           />
           <CartIconButton count={itemCount} onClick={() => setCartOpen(true)} />
 
@@ -178,7 +174,7 @@ export function MarketplaceHeader() {
                 onClick={() => setMenuOpen((v) => !v)}
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
-                className="flex h-10 items-center gap-2 rounded-lg pl-1 pr-2 text-left transition-colors hover:bg-neutral-100"
+                className="flex h-10 items-center gap-2 rounded-lg pl-1 pr-2 text-left transition-colors hover:bg-white/10"
               >
                 <Avatar
                   src={avatarSrc}
@@ -187,14 +183,14 @@ export function MarketplaceHeader() {
                   size="sm"
                   square={isSeller}
                 />
-                <span className="hidden text-sm font-medium text-neutral-900 xl:inline-block xl:max-w-32 xl:truncate">
+                <span className="hidden text-sm font-medium text-white xl:inline-block xl:max-w-32 xl:truncate">
                   {displayName}
                 </span>
                 <ChevronDown
                   size={16}
                   strokeWidth={1.5}
                   className={cn(
-                    'text-neutral-500 transition-transform',
+                    'text-white/80 transition-transform',
                     menuOpen && 'rotate-180'
                   )}
                 />
@@ -203,8 +199,7 @@ export function MarketplaceHeader() {
               {menuOpen && (
                 <div
                   ref={menuRef}
-                  role="menu"
-                  className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-md"
+                  className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-md"
                 >
                   <div className="border-b border-neutral-200 px-4 py-3">
                     <p className="truncate text-sm font-medium text-neutral-900">
@@ -214,78 +209,19 @@ export function MarketplaceHeader() {
                       {user.email}
                     </p>
                   </div>
-                  <ul className="py-1">
-                    <MenuItem
-                      href="/perfil"
-                      icon={<UserIcon size={18} strokeWidth={1.5} />}
-                      onSelect={() => setMenuOpen(false)}
-                    >
-                      Mi perfil
-                    </MenuItem>
-                    <MenuItem
-                      href="/pedidos"
-                      icon={<Package size={18} strokeWidth={1.5} />}
-                      onSelect={() => setMenuOpen(false)}
-                    >
-                      Mis pedidos
-                    </MenuItem>
-                    <MenuItem
-                      href="/suscripciones"
-                      icon={<Repeat size={18} strokeWidth={1.5} />}
-                      onSelect={() => setMenuOpen(false)}
-                    >
-                      Compras recurrentes
-                    </MenuItem>
-                    <MenuItem
-                      href="/inscripciones"
-                      icon={<Ticket size={18} strokeWidth={1.5} />}
-                      onSelect={() => setMenuOpen(false)}
-                    >
-                      Mis inscripciones
-                    </MenuItem>
-                    <MenuItem
-                      href="/favoritos"
-                      icon={<Heart size={18} strokeWidth={1.5} />}
-                      onSelect={() => setMenuOpen(false)}
-                    >
-                      Favoritos
-                    </MenuItem>
-                    {isSeller && (
-                      <>
-                        <MenuItem
-                          href="/mi-tienda"
-                          icon={<Store size={18} strokeWidth={1.5} />}
-                          onSelect={() => setMenuOpen(false)}
-                        >
-                          Mi Tienda
-                        </MenuItem>
-                        <MenuItem
-                          href="/mi-tienda/planes"
-                          icon={<Sparkles size={18} strokeWidth={1.5} />}
-                          onSelect={() => setMenuOpen(false)}
-                        >
-                          Planes
-                        </MenuItem>
-                      </>
-                    )}
-                  </ul>
-                  <div className="border-t border-neutral-200 py-1">
-                    <MenuItem
-                      href="/ajustes"
-                      icon={<Settings size={18} strokeWidth={1.5} />}
-                      onSelect={() => setMenuOpen(false)}
-                    >
-                      Ajustes
-                    </MenuItem>
-                  </div>
-                  <div className="border-t border-neutral-200 py-1">
+                  <AccountMenu
+                    isSeller={isSeller}
+                    pathname={pathname}
+                    onSelect={() => setMenuOpen(false)}
+                  />
+                  <div className="border-t border-neutral-200">
                     <button
                       type="button"
                       role="menuitem"
                       onClick={handleLogout}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-neutral-900 transition-colors hover:bg-neutral-100"
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-neutral-900 transition-colors hover:bg-neutral-100"
                     >
-                      <LogOut size={18} strokeWidth={1.5} className="text-neutral-500" />
+                      <LogOut size={16} strokeWidth={1.5} className="text-neutral-500" />
                       Cerrar sesión
                     </button>
                   </div>
@@ -295,7 +231,7 @@ export function MarketplaceHeader() {
           ) : (
             <Link
               href="/login"
-              className="ml-2 h-10 rounded-lg bg-primary-300 px-4 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500 inline-flex items-center"
+              className="ml-2 h-10 rounded-lg bg-white px-4 text-sm font-semibold text-primary-300 transition-colors hover:bg-primary-50 inline-flex items-center"
             >
               Ingresar
             </Link>
@@ -309,18 +245,40 @@ export function MarketplaceHeader() {
             onClick={() => setMobileOpen(true)}
             icon={<Menu size={22} strokeWidth={1.5} />}
             label="Abrir menú"
-          />
-        </div>
-
-        {/* Hamburger — md (sin lg) para acceder a nav links */}
-        <div className="hidden md:flex lg:hidden">
-          <IconButton
-            onClick={() => setMobileOpen(true)}
-            icon={<Menu size={22} strokeWidth={1.5} />}
-            label="Abrir navegación"
+            className="text-white hover:bg-white/10 hover:text-white"
           />
         </div>
       </div>
+
+      {/* FILA 2 — nav links centrados (md+). En mobile el drawer cubre
+          esta navegación. */}
+      <nav
+        aria-label="Navegación principal"
+        className="hidden border-t border-white/10 md:block"
+      >
+        <ul className="mx-auto flex max-w-7xl items-center justify-center gap-6 overflow-x-auto px-4 py-1.5 sm:px-6 sm:gap-8 lg:gap-12 lg:px-8">
+          {PUBLIC_NAV_LINKS.map((link) => (
+            <li key={link.href} className="shrink-0">
+              <NavLink
+                href={link.href}
+                active={isActive(pathname, link.href)}
+              >
+                {link.label}
+              </NavLink>
+            </li>
+          ))}
+          {user && (
+            <li className="shrink-0">
+              <NavLink
+                href={SHOP_LINK.href}
+                active={isActive(pathname, SHOP_LINK.href)}
+              >
+                {SHOP_LINK.label}
+              </NavLink>
+            </li>
+          )}
+        </ul>
+      </nav>
 
       <MobileMenu
         open={mobileOpen}
@@ -334,7 +292,6 @@ export function MarketplaceHeader() {
         isSeller={isSeller}
         displayName={displayName}
         avatarSrc={avatarSrc}
-        itemCount={itemCount}
       />
 
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
@@ -362,8 +319,8 @@ function NavLink({
       className={cn(
         'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
         active
-          ? 'bg-primary-50 text-primary-700'
-          : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
+          ? 'bg-white/15 text-white'
+          : 'text-white/80 hover:bg-white/10 hover:text-white'
       )}
     >
       {children}
@@ -389,8 +346,8 @@ function PlansPill({
       className={cn(
         'inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-primary-100',
         isFree
-          ? 'border-primary-500 bg-white text-primary-700 hover:bg-primary-50'
-          : 'border-primary-300 bg-primary-50 text-primary-700 hover:bg-primary-100'
+          ? 'border-white/30 bg-transparent text-white hover:bg-white/10'
+          : 'border-white/40 bg-white/15 text-white hover:bg-white/25'
       )}
     >
       <Sparkles size={14} strokeWidth={1.5} aria-hidden />
@@ -413,42 +370,17 @@ function CartIconButton({
         onClick={onClick}
         icon={<ShoppingCart size={20} strokeWidth={1.5} />}
         label={`Carrito${count ? ` (${count} ítems)` : ''}`}
+        className="text-white hover:bg-white/10 hover:text-white"
       />
       {count > 0 && (
         <span
           aria-hidden
-          className="pointer-events-none absolute right-1 top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-300 px-1 text-[10px] font-semibold text-primary-900"
+          className="pointer-events-none absolute right-1 top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-white px-1 text-[10px] font-semibold text-primary-300"
         >
           {count > 9 ? '9+' : count}
         </span>
       )}
     </div>
-  )
-}
-
-function MenuItem({
-  href,
-  icon,
-  children,
-  onSelect,
-}: {
-  href: string
-  icon: ReactNode
-  children: ReactNode
-  onSelect: () => void
-}) {
-  return (
-    <li>
-      <Link
-        href={href}
-        role="menuitem"
-        onClick={onSelect}
-        className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-900 transition-colors hover:bg-neutral-100"
-      >
-        <span className="text-neutral-500">{icon}</span>
-        {children}
-      </Link>
-    </li>
   )
 }
 
@@ -464,7 +396,6 @@ interface MobileMenuProps {
   isSeller: boolean
   displayName: string
   avatarSrc: string | undefined
-  itemCount: number
 }
 
 function MobileMenu({
@@ -479,7 +410,6 @@ function MobileMenu({
   isSeller,
   displayName,
   avatarSrc,
-  itemCount,
 }: MobileMenuProps) {
   return (
     <Drawer open={open} onClose={onClose} title="Menú" side="right" size="md">
@@ -497,7 +427,7 @@ function MobileMenu({
             Marketplace
           </p>
           <ul className="flex flex-col">
-            {NAV_LINKS.map((link) => (
+            {PUBLIC_NAV_LINKS.map((link) => (
               <MobileNavLink
                 key={link.href}
                 href={link.href}
@@ -507,96 +437,32 @@ function MobileMenu({
                 {link.label}
               </MobileNavLink>
             ))}
+            {user && (
+              <MobileNavLink
+                href={SHOP_LINK.href}
+                active={isActive(pathname, SHOP_LINK.href)}
+                onSelect={onClose}
+              >
+                {SHOP_LINK.label}
+              </MobileNavLink>
+            )}
           </ul>
         </nav>
 
-        <nav aria-label="Mi cuenta">
-          <p className="mb-1 px-3 text-xs font-medium uppercase tracking-wider text-neutral-500">
-            Mi cuenta
-          </p>
-          <ul className="flex flex-col">
-            <MobileNavLink
-              href="/favoritos"
-              active={isActive(pathname, '/favoritos')}
-              onSelect={onClose}
-              icon={<Heart size={18} strokeWidth={1.5} />}
-            >
-              Favoritos
-            </MobileNavLink>
-            <MobileNavLink
-              href="/carrito"
-              active={isActive(pathname, '/carrito')}
-              onSelect={onClose}
-              icon={<ShoppingCart size={18} strokeWidth={1.5} />}
-              suffix={itemCount > 0 ? `${itemCount}` : undefined}
-            >
-              Carrito
-            </MobileNavLink>
-            <MobileNavLink
-              href="/perfil"
-              active={isActive(pathname, '/perfil')}
-              onSelect={onClose}
-              icon={<UserIcon size={18} strokeWidth={1.5} />}
-            >
-              Mi perfil
-            </MobileNavLink>
-            <MobileNavLink
-              href="/pedidos"
-              active={isActive(pathname, '/pedidos')}
-              onSelect={onClose}
-              icon={<Package size={18} strokeWidth={1.5} />}
-            >
-              Mis pedidos
-            </MobileNavLink>
-            <MobileNavLink
-              href="/suscripciones"
-              active={isActive(pathname, '/suscripciones')}
-              onSelect={onClose}
-              icon={<Repeat size={18} strokeWidth={1.5} />}
-            >
-              Compras recurrentes
-            </MobileNavLink>
-            <MobileNavLink
-              href="/inscripciones"
-              active={isActive(pathname, '/inscripciones')}
-              onSelect={onClose}
-              icon={<Ticket size={18} strokeWidth={1.5} />}
-            >
-              Mis inscripciones
-            </MobileNavLink>
-            {isSeller && (
-              <>
-                <MobileNavLink
-                  href="/mi-tienda"
-                  active={
-                    isActive(pathname, '/mi-tienda') &&
-                    !isActive(pathname, '/mi-tienda/planes')
-                  }
-                  onSelect={onClose}
-                  icon={<Store size={18} strokeWidth={1.5} />}
-                >
-                  Mi Tienda
-                </MobileNavLink>
-                <MobileNavLink
-                  href="/mi-tienda/planes"
-                  active={isActive(pathname, '/mi-tienda/planes')}
-                  onSelect={onClose}
-                  icon={<Sparkles size={18} strokeWidth={1.5} />}
-                >
-                  Planes
-                </MobileNavLink>
-              </>
-            )}
-            <MobileNavLink
-              href="/ajustes"
-              active={isActive(pathname, '/ajustes')}
-              onSelect={onClose}
-              icon={<Settings size={18} strokeWidth={1.5} />}
-            >
-              Ajustes
-            </MobileNavLink>
-          </ul>
-        </nav>
+        {user && (
+          <nav aria-label="Mi cuenta">
+            <p className="mb-1 px-3 text-xs font-medium uppercase tracking-wider text-neutral-500">
+              Mi cuenta
+            </p>
+            <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
+              <AccountMenu
+                isSeller={isSeller}
+                pathname={pathname}
+                onSelect={onClose}
+              />
+            </div>
+          </nav>
+        )}
 
         <div className="mt-2 border-t border-neutral-200 pt-4">
           {user ? (
@@ -631,7 +497,7 @@ function MobileMenu({
               <Link
                 href="/login"
                 onClick={onClose}
-                className="inline-flex h-10 items-center justify-center rounded-lg bg-primary-300 px-4 text-sm font-semibold text-primary-900 transition-colors hover:bg-primary-500"
+                className="inline-flex h-10 items-center justify-center rounded-lg bg-primary-300 px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-500"
               >
                 Ingresar
               </Link>
@@ -692,5 +558,173 @@ function MobileNavLink({
         )}
       </Link>
     </li>
+  )
+}
+
+/* ─── ACCOUNT MENU (grupos colapsables) ─────────────────────────
+ * Compartido entre el dropdown desktop y la sección "Mi cuenta" del drawer
+ * mobile. Cada grupo se expande/colapsa de forma independiente.
+ */
+
+type AccountMenuItem = {
+  href: string
+  label: string
+  Icon: typeof Package
+}
+
+type AccountMenuGroup = {
+  id: string
+  label: string
+  Icon: typeof ShoppingBag
+  sellerOnly?: boolean
+  items: AccountMenuItem[]
+}
+
+const ACCOUNT_MENU_GROUPS: AccountMenuGroup[] = [
+  {
+    id: 'compras',
+    label: 'Compras',
+    Icon: ShoppingBag,
+    items: [
+      { href: '/pedidos', label: 'Mis pedidos', Icon: Package },
+      { href: '/suscripciones', label: 'Compras recurrentes', Icon: Repeat },
+      { href: '/inscripciones', label: 'Mis inscripciones', Icon: Ticket },
+      { href: '/favoritos', label: 'Favoritos', Icon: Heart },
+    ],
+  },
+  {
+    id: 'ventas',
+    label: 'Ventas',
+    Icon: Store,
+    sellerOnly: true,
+    items: [
+      { href: '/mi-tienda', label: 'Resumen', Icon: LayoutDashboard },
+      { href: '/mi-tienda/pedidos', label: 'Pedidos recibidos', Icon: ShoppingBag },
+      { href: '/mi-tienda/publicaciones', label: 'Publicaciones', Icon: Package },
+      { href: '/mi-tienda/eventos', label: 'Eventos', Icon: Calendar },
+      { href: '/mi-tienda/planes', label: 'Planes', Icon: Sparkles },
+    ],
+  },
+  {
+    id: 'perfil',
+    label: 'Mi perfil',
+    Icon: UserIcon,
+    items: [
+      { href: '/perfil', label: 'Datos personales', Icon: UserIcon },
+      { href: '/ajustes', label: 'Ajustes', Icon: Settings },
+    ],
+  },
+]
+
+function AccountMenu({
+  isSeller,
+  pathname,
+  onSelect,
+}: {
+  isSeller: boolean
+  pathname: string | null
+  onSelect: () => void
+}) {
+  const visibleGroups = ACCOUNT_MENU_GROUPS.filter(
+    (g) => !g.sellerOnly || isSeller
+  )
+
+  // Estado inicial: vendedor abre "Ventas", comprador abre "Compras".
+  // El usuario puede expandir / colapsar otros grupos a voluntad.
+  const [openIds, setOpenIds] = useState<Set<string>>(
+    () => new Set<string>([isSeller ? 'ventas' : 'compras'])
+  )
+
+  function toggle(id: string) {
+    setOpenIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  return (
+    <ul className="flex flex-col" role="menu">
+      {visibleGroups.map((group) => {
+        const isOpen = openIds.has(group.id)
+        const GroupIcon = group.Icon
+        const groupHasActive = group.items.some((item) =>
+          isActive(pathname, item.href)
+        )
+        return (
+          <li
+            key={group.id}
+            className="border-b border-neutral-200 last:border-b-0"
+          >
+            <button
+              type="button"
+              onClick={() => toggle(group.id)}
+              aria-expanded={isOpen}
+              aria-controls={`menu-group-${group.id}`}
+              className={cn(
+                'flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-100 focus:outline-none focus-visible:bg-neutral-100',
+                groupHasActive && 'bg-primary-50/50'
+              )}
+            >
+              <span className="inline-flex items-center gap-3 text-sm font-semibold text-neutral-900">
+                <GroupIcon
+                  size={16}
+                  strokeWidth={1.5}
+                  className={
+                    groupHasActive ? 'text-primary-500' : 'text-neutral-500'
+                  }
+                  aria-hidden
+                />
+                {group.label}
+              </span>
+              <ChevronDown
+                size={14}
+                strokeWidth={1.5}
+                className={cn(
+                  'text-neutral-500 transition-transform',
+                  isOpen && 'rotate-180'
+                )}
+                aria-hidden
+              />
+            </button>
+            {isOpen && (
+              <ul id={`menu-group-${group.id}`} className="pb-2" role="group">
+                {group.items.map((item) => {
+                  const active = isActive(pathname, item.href)
+                  const ItemIcon = item.Icon
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        role="menuitem"
+                        onClick={onSelect}
+                        aria-current={active ? 'page' : undefined}
+                        className={cn(
+                          'flex items-center gap-3 py-2 pl-12 pr-4 text-sm transition-colors',
+                          active
+                            ? 'bg-primary-50 font-medium text-primary-700'
+                            : 'text-neutral-900 hover:bg-neutral-100'
+                        )}
+                      >
+                        <ItemIcon
+                          size={14}
+                          strokeWidth={1.5}
+                          className={
+                            active ? 'text-primary-500' : 'text-neutral-500'
+                          }
+                          aria-hidden
+                        />
+                        {item.label}
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </li>
+        )
+      })}
+    </ul>
   )
 }

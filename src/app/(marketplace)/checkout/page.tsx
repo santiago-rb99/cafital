@@ -19,6 +19,7 @@ import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { Spinner } from '@/components/ui/Spinner'
 import { CartItemsBySeller } from '@/components/cart/CartItemsBySeller'
+import { QrPaymentModal } from '@/components/cart/QrPaymentModal'
 
 import { useAuth } from '@/contexts/AuthContext'
 import { useCart } from '@/contexts/CartContext'
@@ -74,6 +75,7 @@ export default function CheckoutPage() {
 
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
   const [submitting, setSubmitting] = useState(false)
+  const [showQr, setShowQr] = useState(false)
 
   // Hidratar campos desde el usuario (patrón "state from prop").
   const [hydratedFromUserId, setHydratedFromUserId] = useState<string | null>(null)
@@ -104,21 +106,19 @@ export default function CheckoutPage() {
     return Object.keys(next).length === 0
   }
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (!user) {
-      showInfo(
-        'Inicia sesión para finalizar el pedido',
-        'Necesitas una cuenta para confirmar la compra.'
-      )
-      router.push(`/login?next=${encodeURIComponent('/checkout')}`)
-      return
-    }
-    if (!validate()) return
-
+  async function finishOrder() {
+    if (!user) return
     setSubmitting(true)
     try {
-      const orders = await createOrdersFromCart(user.id, items)
+      const shippingAddress = {
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        department,
+        city: city.trim(),
+        address: address.trim(),
+        ...(notes.trim() ? { notes: notes.trim() } : {}),
+      }
+      const orders = await createOrdersFromCart(user.id, items, shippingAddress)
       clearCart()
       showSuccess(
         '¡Pedido confirmado!',
@@ -134,7 +134,29 @@ export default function CheckoutPage() {
         'Inténtalo nuevamente en unos segundos.'
       )
       setSubmitting(false)
+      setShowQr(false)
     }
+  }
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!user) {
+      showInfo(
+        'Inicia sesión para finalizar el pedido',
+        'Necesitas una cuenta para confirmar la compra.'
+      )
+      router.push(`/login?next=${encodeURIComponent('/checkout')}`)
+      return
+    }
+    if (!validate()) return
+
+    // QR Simple: abrir modal con código QR + verificación simulada.
+    // Al confirmar el "pago" se crea el pedido.
+    if (payment === 'qr') {
+      setShowQr(true)
+      return
+    }
+    await finishOrder()
   }
 
   if (items.length === 0) {
@@ -146,7 +168,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="bg-neutral-100">
+    <div className="bg-page">
       <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <Breadcrumbs
           items={[
@@ -426,6 +448,14 @@ export default function CheckoutPage() {
             </div>
           </aside>
         </form>
+
+        <QrPaymentModal
+          open={showQr}
+          amount={total}
+          reference={`Pedido Cafital · ${itemCount} ${itemCount === 1 ? 'producto' : 'productos'}`}
+          onConfirmed={finishOrder}
+          onClose={() => setShowQr(false)}
+        />
       </div>
     </div>
   )

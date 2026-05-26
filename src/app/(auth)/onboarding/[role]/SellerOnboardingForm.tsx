@@ -32,7 +32,7 @@ import { cn, DEPARTMENTS } from '@/lib/utils'
 
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
-import { updateUserProfile } from '@/lib/api/users'
+import { updateUserProfile, upgradeBuyerToSeller } from '@/lib/api/users'
 
 const NAME_MIN = 2
 const DESC_MAX = 280
@@ -50,10 +50,22 @@ function getInitials(text: string) {
     .toUpperCase()
 }
 
-export function SellerOnboardingForm() {
+export interface SellerOnboardingFormProps {
+  /**
+   * 'onboarding' (default): el usuario YA es vendedor y completa su perfil.
+   * 'upgrade': el usuario es comprador y se convierte en vendedor.
+   */
+  mode?: 'onboarding' | 'upgrade'
+}
+
+export function SellerOnboardingForm({
+  mode = 'onboarding',
+}: SellerOnboardingFormProps = {}) {
   const router = useRouter()
   const { user, refreshUser } = useAuth()
   const { showSuccess, showError } = useToast()
+  const isUpgrade = mode === 'upgrade'
+  const expectedRole: 'buyer' | 'seller' = isUpgrade ? 'buyer' : 'seller'
 
   const [redirecting, setRedirecting] = useState(false)
   const [businessName, setBusinessName] = useState('')
@@ -75,16 +87,18 @@ export function SellerOnboardingForm() {
   const logoObjectUrlRef = useRef<string | null>(null)
   const bannerObjectUrlRef = useRef<string | null>(null)
 
-  // Guard: sólo vendedores autenticados acceden. Sin sesión o como comprador → fuera.
-  const wrongRole = user !== null && user.role !== 'seller'
+  // Guard: el rol esperado depende del modo. En upgrade el usuario debe ser
+  // comprador; en onboarding debe ser vendedor.
+  const wrongRole = user !== null && user.role !== expectedRole
   if (wrongRole && !redirecting) setRedirecting(true)
   useEffect(() => {
     if (wrongRole) router.replace('/')
   }, [wrongRole, router])
 
-  // Hidratar campos del vendedor (patrón "state from prop").
+  // Hidratar campos del vendedor existente (solo onboarding). En upgrade el
+  // comprador no tiene datos de negocio que prellenar.
   const [hydratedFromSellerId, setHydratedFromSellerId] = useState<string | null>(null)
-  if (user && user.role === 'seller' && user.id !== hydratedFromSellerId) {
+  if (!isUpgrade && user && user.role === 'seller' && user.id !== hydratedFromSellerId) {
     setHydratedFromSellerId(user.id)
     setBusinessName((prev) => prev || user.businessName)
     setDepartment((prev) => prev || user.department || '')
@@ -159,7 +173,7 @@ export function SellerOnboardingForm() {
   }
 
   async function persist(patch: {
-    businessName?: string
+    businessName: string
     description?: string
     department?: string
     municipality?: string
@@ -168,13 +182,17 @@ export function SellerOnboardingForm() {
     banner?: string
   }) {
     if (!user) return
-    await updateUserProfile(user.id, patch)
+    if (isUpgrade) {
+      await upgradeBuyerToSeller(user.id, patch)
+    } else {
+      await updateUserProfile(user.id, patch)
+    }
     refreshUser()
   }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (!user || user.role !== 'seller') return
+    if (!user || user.role !== expectedRole) return
 
     const nErr = validateName(businessName)
     const dErr = validateDept(department)
@@ -198,8 +216,10 @@ export function SellerOnboardingForm() {
         banner: bannerUrl ?? undefined,
       })
       showSuccess(
-        '¡Tu tienda está lista!',
-        'Crea tu primera publicación cuando quieras desde Mi Tienda.'
+        isUpgrade ? '¡Tu cuenta de vendedor está activa!' : '¡Tu tienda está lista!',
+        isUpgrade
+          ? 'Crea tu primera publicación cuando quieras desde Mi Tienda.'
+          : 'Crea tu primera publicación cuando quieras desde Mi Tienda.'
       )
       router.push('/mi-tienda')
     } catch {
@@ -212,7 +232,15 @@ export function SellerOnboardingForm() {
   }
 
   async function onSkip() {
-    if (!user || user.role !== 'seller' || submitting) return
+    if (submitting) return
+    // En upgrade no se puede "saltar": el comprador necesita completar al
+    // menos el nombre comercial para que se cree el registro de vendedor.
+    // El botón se vuelve "Cancelar" y nos lleva al home.
+    if (isUpgrade) {
+      router.push('/')
+      return
+    }
+    if (!user || user.role !== 'seller') return
     setSubmitting('skip')
     try {
       const trimmed = businessName.trim()
@@ -250,23 +278,27 @@ export function SellerOnboardingForm() {
     <div className="flex flex-col gap-6">
       <header className="text-center">
         <h1 className="font-serif text-3xl font-bold leading-tight text-neutral-900">
-          Configura tu tienda
+          {isUpgrade ? 'Activa tu tienda' : 'Configura tu tienda'}
         </h1>
         <p className="mt-2 text-sm text-neutral-500">
-          Los compradores verán esto en tu perfil público y en cada publicación.
+          {isUpgrade
+            ? 'Completa los datos de tu negocio para empezar a publicar. Se mostrarán en tu perfil público.'
+            : 'Los compradores verán esto en tu perfil público y en cada publicación.'}
         </p>
 
-        <div
-          className="mt-4 flex items-center justify-center gap-2 text-xs text-neutral-500"
-          aria-live="polite"
-        >
-          <span>Último paso</span>
-          <span className="flex gap-1" aria-hidden>
-            <span className="h-1 w-8 rounded-full bg-primary-300" />
-            <span className="h-1 w-8 rounded-full bg-primary-300" />
-            <span className="h-1 w-8 rounded-full bg-primary-300" />
-          </span>
-        </div>
+        {!isUpgrade && (
+          <div
+            className="mt-4 flex items-center justify-center gap-2 text-xs text-neutral-500"
+            aria-live="polite"
+          >
+            <span>Último paso</span>
+            <span className="flex gap-1" aria-hidden>
+              <span className="h-1 w-8 rounded-full bg-primary-300" />
+              <span className="h-1 w-8 rounded-full bg-primary-300" />
+              <span className="h-1 w-8 rounded-full bg-primary-300" />
+            </span>
+          </div>
+        )}
       </header>
 
       <section
@@ -425,7 +457,7 @@ export function SellerOnboardingForm() {
               disabled={isSaving}
               loading={isSkipping}
             >
-              Saltar por ahora
+              {isUpgrade ? 'Cancelar' : 'Saltar por ahora'}
             </Button>
 
             <Button
@@ -439,7 +471,7 @@ export function SellerOnboardingForm() {
                 ) : undefined
               }
             >
-              Guardar y abrir mi tienda
+              {isUpgrade ? 'Activar tienda' : 'Guardar y abrir mi tienda'}
             </Button>
           </div>
         </form>
@@ -449,7 +481,7 @@ export function SellerOnboardingForm() {
         Podrás actualizar estos datos cuando quieras desde{' '}
         <Link
           href="/mi-tienda/ajustes"
-          className="font-medium text-primary-500 underline-offset-2 hover:text-primary-700 hover:underline focus:outline-none focus-visible:underline"
+          className="font-medium text-primary-300 underline-offset-2 hover:text-primary-500 hover:underline focus:outline-none focus-visible:underline"
         >
           ajustes de tienda
         </Link>

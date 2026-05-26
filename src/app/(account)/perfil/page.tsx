@@ -176,7 +176,7 @@ export default function PerfilPage() {
   const descRemaining = DESC_MAX - description.length
 
   return (
-    <div className="bg-neutral-100">
+    <div className="bg-page">
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <Breadcrumbs items={[{ label: 'Perfil' }]} className="mb-5" />
 
