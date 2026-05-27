@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { BadgeCheck, MapPin } from 'lucide-react'
 import { PublicationCategory, Seller } from '@/types'
 import { CATEGORY_LABEL } from './sellerCategoriesUtils'
-import { cn } from '@/lib/utils'
+import { cn, isSellerVerified } from '@/lib/utils'
 
 interface SellerCardProps {
   seller: Seller
@@ -19,7 +19,7 @@ export function SellerCard({
   categories,
   className,
 }: SellerCardProps) {
-  const isVerified = seller.subscriptionPlan !== 'none'
+  const isVerified = isSellerVerified(seller)
 
   return (
     <article

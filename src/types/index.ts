@@ -1,6 +1,14 @@
 /* ─── SUBSCRIPTION ─────────────────────────────────────────── */
 export type SubscriptionPlan = 'none' | 'semilla' | 'cosecha' | 'exportacion'
 
+/* ─── VERIFICATION ──────────────────────────────────────────── */
+export type VerificationStatus = 'pending' | 'approved' | 'rejected'
+
+export interface VerificationDocs {
+  idDocument?: string
+  nitDocument?: string
+}
+
 export const SUBSCRIPTION_PRICES: Record<SubscriptionPlan, number> = {
   none: 0,
   semilla: 9.99,
@@ -60,6 +68,16 @@ export interface Seller extends BaseUser {
     history?: string
   }
   profileImages?: string[]
+  /** Estado de verificación del vendedor por el equipo Cafital. */
+  verificationStatus?: VerificationStatus
+  /** Documentos cargados para la verificación (URLs mock). */
+  verificationDocs?: VerificationDocs
+  /** ISO de envío de solicitud de verificación. */
+  verificationSubmittedAt?: string
+  /** ISO de revisión por el admin (aprobado o rechazado). */
+  verificationReviewedAt?: string
+  /** Motivo de rechazo, requerido si `verificationStatus === 'rejected'`. */
+  verificationRejectionReason?: string
 }
 
 export type User = Buyer | Seller | Admin
@@ -94,6 +112,11 @@ export interface Publication {
   attributes: Record<string, string | string[]>
   status: PublicationStatus
   views?: number
+  /**
+   * Contactos vía WhatsApp acumulados sobre la publicación. Si no está
+   * sembrado, se aproxima a partir de `views` para fines de métricas.
+   */
+  whatsappContactCount?: number
   createdAt: string
   /** Marca de destacado por el equipo administrativo. */
   featured?: boolean

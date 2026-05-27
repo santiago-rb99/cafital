@@ -7,6 +7,7 @@ import {
   ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
+  BadgeCheck,
   Calendar,
   CalendarClock,
   CheckCircle2,
@@ -18,6 +19,7 @@ import {
   PackageX,
   PauseCircle,
   Plus,
+  ShieldAlert,
   ShoppingBag,
   Sparkles,
   TrendingUp,
@@ -206,6 +208,30 @@ export default function MiTiendaPage() {
       title: 'Tu plan vence pronto',
       description: `${subscriptionLabel(seller.subscriptionPlan)} vence el ${formatDate(seller.subscriptionExpiry!)}.`,
       href: '/mi-tienda/planes',
+    })
+  }
+  // ── Alertas de verificación ─────────────────────────────────
+  const verificationStatus = seller.verificationStatus ?? 'pending'
+  const hasVerificationDocs = !!seller.verificationDocs?.idDocument
+  if (verificationStatus === 'rejected') {
+    alerts.push({
+      id: 'verification-rejected',
+      Icon: ShieldAlert,
+      tone: 'destructive',
+      title: 'Tu verificación fue rechazada',
+      description:
+        'Revisa el motivo y reenvía tus documentos para obtener el badge de vendedor verificado.',
+      href: '/mi-tienda/verificacion',
+    })
+  } else if (verificationStatus === 'pending' && !hasVerificationDocs) {
+    alerts.push({
+      id: 'verification-pending',
+      Icon: BadgeCheck,
+      tone: 'warning',
+      title: 'Completa tu verificación',
+      description:
+        'Sube tu documento de identidad para mostrar el badge "Vendedor verificado" en tu perfil.',
+      href: '/mi-tienda/verificacion',
     })
   }
 
@@ -588,7 +614,7 @@ function DeltaBadge({ value }: { value: number }) {
 interface AlertItem {
   id: string
   Icon: typeof AlertTriangle
-  tone: 'warning' | 'neutral'
+  tone: 'warning' | 'neutral' | 'destructive'
   title: string
   description: string
   href?: string
@@ -634,7 +660,9 @@ function AlertsCard({ alerts }: { alerts: AlertItem[] }) {
                 <span
                   className={cn(
                     'mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
-                    alert.tone === 'warning'
+                    alert.tone === 'destructive'
+                      ? 'bg-error-bg text-error-dark'
+                      : alert.tone === 'warning'
                       ? 'bg-[#FDEFC2] text-[#8C5A08]'
                       : 'bg-neutral-100 text-neutral-500'
                   )}

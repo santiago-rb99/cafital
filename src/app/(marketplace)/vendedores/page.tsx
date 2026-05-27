@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { SearchX, Store } from 'lucide-react';
 
 import { Seller } from '@/types';
+import { isSellerVerified } from '@/lib/utils';
 import { EmptyState } from '@/components/ui/EmptyState';
 
 import { SellersFilterPanel } from '@/components/seller/SellersFilterPanel';
@@ -84,7 +85,7 @@ export default async function VendedoresPage({
 
         <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8">
           <aside className="hidden lg:block">
-            <div className="sticky top-20 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto overscroll-contain rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
               <SellersFilterPanel state={state} />
             </div>
           </aside>
@@ -157,7 +158,7 @@ function filterAndSort(
     const info = index[s.id];
     // Sin publicaciones activas: ocultos del grid por decisión de UX
     if (!info || info.activeCount === 0) return false;
-    if (state.verifiedOnly && s.subscriptionPlan === 'none') return false;
+    if (state.verifiedOnly && !isSellerVerified(s)) return false;
     if (state.category && !info.categories.includes(state.category))
       return false;
     if (state.department && s.department !== state.department) return false;

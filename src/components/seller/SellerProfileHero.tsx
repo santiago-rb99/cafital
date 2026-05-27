@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { BadgeCheck, FileBadge, MapPin } from 'lucide-react'
 import { Seller } from '@/types'
 import { WhatsAppButton } from '@/components/catalog/WhatsAppButton'
+import { isSellerVerified } from '@/lib/utils'
 import { SellerFavoriteButton } from './SellerFavoriteButton'
 
 interface SellerProfileHeroProps {
@@ -13,7 +14,7 @@ export function SellerProfileHero({
   seller,
   publicationsCount,
 }: SellerProfileHeroProps) {
-  const isVerified = seller.subscriptionPlan !== 'none'
+  const isVerified = isSellerVerified(seller)
 
   return (
     <section

@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import {
+  BadgeCheck,
   Calendar,
   LayoutDashboard,
   Package,
@@ -12,6 +13,7 @@ import {
   Users,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { listSellersByVerification } from '@/lib/api/admin'
 import { cn } from '@/lib/utils'
 
 interface NavItem {
@@ -19,6 +21,7 @@ interface NavItem {
   label: string
   icon: ReactNode
   matchExact?: boolean
+  badgeKey?: 'pendingVerifications'
 }
 
 const ADMIN_NAV: NavItem[] = [
@@ -32,6 +35,12 @@ const ADMIN_NAV: NavItem[] = [
     href: '/admin/usuarios',
     label: 'Usuarios',
     icon: <Users size={18} strokeWidth={1.5} />,
+  },
+  {
+    href: '/admin/verificaciones',
+    label: 'Verificaciones',
+    icon: <BadgeCheck size={18} strokeWidth={1.5} />,
+    badgeKey: 'pendingVerifications',
   },
   {
     href: '/admin/publicaciones',
@@ -57,6 +66,27 @@ interface AdminSidebarProps {
 export function AdminSidebar({ onNavigate }: AdminSidebarProps) {
   const pathname = usePathname()
   const { user } = useAuth()
+  const [pendingCount, setPendingCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    listSellersByVerification('pending')
+      .then((sellers) => {
+        if (!cancelled) setPendingCount(sellers.length)
+      })
+      .catch(() => {
+        if (!cancelled) setPendingCount(0)
+      })
+    return () => {
+      cancelled = true
+    }
+    // Re-fetch al cambiar de ruta (ej. tras aprobar/rechazar)
+  }, [pathname])
+
+  const badgeValueFor = (key?: NavItem['badgeKey']): number | null => {
+    if (key === 'pendingVerifications') return pendingCount ?? null
+    return null
+  }
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -86,6 +116,7 @@ export function AdminSidebar({ onNavigate }: AdminSidebarProps) {
               ? pathname === item.href
               : pathname === item.href ||
                 pathname?.startsWith(item.href + '/')
+            const badgeValue = badgeValueFor(item.badgeKey)
             return (
               <li key={item.href}>
                 <Link
@@ -106,7 +137,15 @@ export function AdminSidebar({ onNavigate }: AdminSidebarProps) {
                   >
                     {item.icon}
                   </span>
-                  {item.label}
+                  <span className="flex-1">{item.label}</span>
+                  {badgeValue !== null && badgeValue > 0 && (
+                    <span
+                      aria-label={`${badgeValue} pendientes`}
+                      className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-500 px-1.5 text-[11px] font-semibold text-white"
+                    >
+                      {badgeValue}
+                    </span>
+                  )}
                 </Link>
               </li>
             )

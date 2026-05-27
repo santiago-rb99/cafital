@@ -1,6 +1,10 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { SubscriptionPlan } from '@/types'
+import { Seller, SubscriptionPlan } from '@/types'
+
+export function isSellerVerified(seller: Pick<Seller, 'verificationStatus'>): boolean {
+  return seller.verificationStatus === 'approved'
+}
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

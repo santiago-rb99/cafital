@@ -65,7 +65,7 @@ export default async function CatalogoPage({
 
         <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8">
           <aside className="hidden lg:block">
-            <div className="sticky top-20 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto overscroll-contain rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
               <FilterPanel state={state} categories={categories} />
             </div>
           </aside>

@@ -95,13 +95,13 @@ export function Modal({
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'anim-modal-in relative z-10 w-full overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-lg focus:outline-none',
+          'anim-modal-in relative z-10 flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-lg focus:outline-none',
           SIZE_STYLES[size],
           className
         )}
       >
         {(title || !hideCloseButton) && (
-          <div className="flex items-start justify-between gap-4 border-b border-neutral-200 px-6 py-4">
+          <div className="flex shrink-0 items-start justify-between gap-4 border-b border-neutral-200 px-6 py-4">
             <div className="flex flex-col">
               {title && (
                 <h2 className="font-serif text-xl font-semibold text-neutral-900">
@@ -123,10 +123,12 @@ export function Modal({
           </div>
         )}
         {hasVisibleChildren(children) && (
-          <div className="px-6 py-5">{children}</div>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-5">
+            {children}
+          </div>
         )}
         {footer && (
-          <div className="flex items-center justify-end gap-2 border-t border-neutral-200 bg-neutral-100/50 px-6 py-4">
+          <div className="flex shrink-0 items-center justify-end gap-2 border-t border-neutral-200 bg-neutral-100/50 px-6 py-4">
             {footer}
           </div>
         )}

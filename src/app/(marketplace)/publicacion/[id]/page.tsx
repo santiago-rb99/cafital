@@ -16,6 +16,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
 import { AttributeRenderer } from '@/components/catalog/AttributeRenderer'
 import { PurchasePanel } from '@/components/catalog/PurchasePanel'
 import { RelatedPublications } from '@/components/catalog/RelatedPublications'
+import { isSellerVerified } from '@/lib/utils'
 
 const CATEGORY_LABEL: Record<Publication['category'], string> = {
   A: 'Café e insumos',
@@ -62,7 +63,7 @@ export default async function PublicacionPage({
     .map((entry) => entry.p)
 
   const isLand = publication.category === 'D'
-  const isVerifiedSeller = seller.subscriptionPlan !== 'none'
+  const isVerifiedSeller = isSellerVerified(seller)
 
   return (
     <div className="bg-page">

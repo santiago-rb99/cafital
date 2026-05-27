@@ -6,10 +6,19 @@ interface StatCardProps {
   value: ReactNode
   hint?: ReactNode
   icon?: ReactNode
+  /** Slot opcional para un `DeltaBadge` u otro indicador junto al valor. */
+  delta?: ReactNode
   className?: string
 }
 
-export function StatCard({ label, value, hint, icon, className }: StatCardProps) {
+export function StatCard({
+  label,
+  value,
+  hint,
+  icon,
+  delta,
+  className,
+}: StatCardProps) {
   return (
     <div
       className={cn(
@@ -30,9 +39,12 @@ export function StatCard({ label, value, hint, icon, className }: StatCardProps)
           </span>
         )}
       </div>
-      <p className="mt-3 font-serif text-3xl font-bold text-neutral-900">
-        {value}
-      </p>
+      <div className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+        <p className="font-serif text-3xl font-bold text-neutral-900">
+          {value}
+        </p>
+        {delta}
+      </div>
       {hint && <p className="mt-1 text-xs text-neutral-500">{hint}</p>}
     </div>
   )

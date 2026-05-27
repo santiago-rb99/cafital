@@ -1,4 +1,4 @@
-import { Buyer, Seller, User } from '@/types'
+import { Buyer, Seller, User, VerificationDocs } from '@/types'
 import {
   ALL_MOCK_USERS,
   mockBuyers,
@@ -96,11 +96,47 @@ export async function upgradeBuyerToSeller(
     ...(input.banner ? { banner: input.banner } : {}),
     ...(input.nit ? { nit: input.nit } : {}),
     subscriptionPlan: 'none',
+    verificationStatus: 'pending',
+    verificationSubmittedAt: new Date().toISOString(),
     createdAt: current.createdAt,
   }
 
   usersStore.update(buyerId, seller)
   return seller
+}
+
+/**
+ * El vendedor envía (o reenvía) sus documentos de verificación. Marca la
+ * solicitud como `pending`, registra la fecha de envío, limpia cualquier
+ * motivo de rechazo previo y guarda los documentos provistos.
+ */
+export async function submitVerificationDocs(
+  sellerId: string,
+  docs: VerificationDocs
+): Promise<Seller> {
+  await delay()
+  const current = allUsers().find((u) => u.id === sellerId)
+  if (!current) throw new ApiError('Usuario no encontrado', 404)
+  if (current.role !== 'seller') {
+    throw new ApiError('Solo los vendedores pueden enviar verificación', 403)
+  }
+  if (!docs.idDocument) {
+    throw new ApiError('Falta el documento de identidad', 400)
+  }
+
+  const updated: Seller = {
+    ...current,
+    verificationStatus: 'pending',
+    verificationSubmittedAt: new Date().toISOString(),
+    verificationReviewedAt: undefined,
+    verificationRejectionReason: undefined,
+    verificationDocs: {
+      idDocument: docs.idDocument,
+      ...(docs.nitDocument ? { nitDocument: docs.nitDocument } : {}),
+    },
+  }
+  usersStore.update(sellerId, updated)
+  return updated
 }
 
 // Re-export para conveniencia

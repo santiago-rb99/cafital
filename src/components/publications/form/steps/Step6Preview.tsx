@@ -5,7 +5,7 @@ import { BadgeCheck, MapPin, MessageCircle, Repeat, ShoppingCart } from 'lucide-
 import { AttributeRenderer } from '@/components/catalog/AttributeRenderer'
 import { getSubcategoryById } from '@/data/mock/categories'
 import { Seller } from '@/types'
-import { cn, formatPrice } from '@/lib/utils'
+import { cn, formatPrice, isSellerVerified } from '@/lib/utils'
 import { PublicationFormData, toProductUnits } from '../types'
 
 interface Props {
@@ -34,7 +34,7 @@ export function Step6Preview({ data, seller }: Props) {
   const hasDiscount =
     data.discountEnabled && typeof data.discount === 'number' && data.discount > 0
   const discountFactor = hasDiscount ? 1 - (data.discount as number) / 100 : 1
-  const isVerifiedSeller = seller.subscriptionPlan !== 'none'
+  const isVerifiedSeller = isSellerVerified(seller)
 
   return (
     <div className="flex flex-col gap-4">

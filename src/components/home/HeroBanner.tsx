@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, BadgeCheck } from 'lucide-react'
 import { Seller } from '@/types'
+import { isSellerVerified } from '@/lib/utils'
 import { HeroCarousel } from './HeroCarousel'
 
 export interface HeroSellerSlide {
@@ -61,7 +62,7 @@ function SellerHeroSlide({
   copy,
   priority,
 }: SellerHeroSlideProps) {
-  const isVerified = seller.subscriptionPlan !== 'none'
+  const isVerified = isSellerVerified(seller)
   const locationParts = [seller.municipality, seller.department].filter(Boolean)
 
   return (

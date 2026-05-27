@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ReactNode } from 'react'
 import {
+  BadgeCheck,
   BarChart3,
   Calendar,
   LayoutDashboard,
@@ -27,6 +28,7 @@ interface NavItem {
   icon: ReactNode
   matchExact?: boolean
   requiresPlan?: 'exportacion'
+  showVerificationDot?: boolean
 }
 
 const SHOP_NAV: NavItem[] = [
@@ -63,6 +65,12 @@ const SHOP_NAV: NavItem[] = [
     icon: <UserCircle size={18} strokeWidth={1.5} />,
   },
   {
+    href: '/mi-tienda/verificacion',
+    label: 'Verificación',
+    icon: <BadgeCheck size={18} strokeWidth={1.5} />,
+    showVerificationDot: true,
+  },
+  {
     href: '/mi-tienda/publicidad',
     label: 'Publicidad',
     icon: <Megaphone size={18} strokeWidth={1.5} />,
@@ -91,6 +99,18 @@ export function ShopSidebar({ onNavigate }: ShopSidebarProps) {
   const items = SHOP_NAV.filter(
     (item) => !item.requiresPlan || item.requiresPlan === subscriptionPlan
   )
+
+  const verificationStatus = seller?.verificationStatus ?? 'pending'
+  const hasVerificationDocs = !!seller?.verificationDocs?.idDocument
+  const verificationDot = (() => {
+    if (verificationStatus === 'rejected') {
+      return { tone: 'destructive', label: 'Rechazada' } as const
+    }
+    if (verificationStatus === 'pending' && !hasVerificationDocs) {
+      return { tone: 'warning', label: 'Pendiente' } as const
+    }
+    return null
+  })()
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -159,6 +179,7 @@ export function ShopSidebar({ onNavigate }: ShopSidebarProps) {
               ? pathname === item.href
               : pathname === item.href ||
                 pathname?.startsWith(item.href + '/')
+            const dot = item.showVerificationDot ? verificationDot : null
             return (
               <li key={item.href}>
                 <Link
@@ -179,7 +200,18 @@ export function ShopSidebar({ onNavigate }: ShopSidebarProps) {
                   >
                     {item.icon}
                   </span>
-                  {item.label}
+                  <span className="flex-1">{item.label}</span>
+                  {dot && (
+                    <span
+                      aria-label={dot.label}
+                      className={cn(
+                        'inline-block h-2 w-2 rounded-full',
+                        dot.tone === 'destructive'
+                          ? 'bg-[#D32F2F]'
+                          : 'bg-accent-500'
+                      )}
+                    />
+                  )}
                 </Link>
               </li>
             )

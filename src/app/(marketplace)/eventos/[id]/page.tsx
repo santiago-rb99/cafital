@@ -23,7 +23,7 @@ import {
   EVENT_TYPE_LABEL,
 } from '@/components/events/eventFiltersState'
 
-import { formatDate } from '@/lib/utils'
+import { formatDate, isSellerVerified } from '@/lib/utils'
 
 export default async function EventoDetallePage({
   params,
@@ -39,7 +39,7 @@ export default async function EventoDetallePage({
     organizerUser?.role === 'seller' ? (organizerUser as Seller) : null
 
   const isVirtual = event.modality === 'virtual'
-  const isVerified = organizer?.subscriptionPlan !== 'none'
+  const isVerified = organizer ? isSellerVerified(organizer) : false
 
   return (
     <div className="bg-page">

@@ -121,7 +121,7 @@ export default function MiTiendaPlanesPage() {
         onClose={() => setConfirmCancel(false)}
         onConfirm={doCancel}
         title="¿Cancelar tu suscripción?"
-        description="Volverás al plan gratuito. Perderás aparecer en hero, badges de verificación y demás beneficios premium hasta que vuelvas a contratar."
+        description="Volverás al plan gratuito. Perderás apariciones en hero, vendedores destacados y demás beneficios premium hasta que vuelvas a contratar. Tu verificación de identidad se mantiene independiente del plan."
         confirmLabel={cancelling ? 'Cancelando…' : 'Sí, cancelar'}
         cancelLabel="Mantener plan"
         variant="destructive"
