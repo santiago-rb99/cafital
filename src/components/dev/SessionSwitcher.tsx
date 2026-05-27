@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronUp, User, Store, BadgeCheck } from 'lucide-react'
+import { ChevronUp, User, Store, BadgeCheck, ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { DEV_USERS } from '@/data/mock/users'
 import { Seller } from '@/types'
@@ -35,7 +35,9 @@ export function DevSessionSwitcher() {
                   <span className="shrink-0">
                     {u.role === 'Comprador'
                       ? <User size={16} strokeWidth={1.5} />
-                      : <Store size={16} strokeWidth={1.5} />}
+                      : u.role === 'Administrador'
+                        ? <ShieldCheck size={16} strokeWidth={1.5} />
+                        : <Store size={16} strokeWidth={1.5} />}
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className="block truncate font-medium">{u.label}</span>
@@ -61,7 +63,7 @@ export function DevSessionSwitcher() {
         <span className="font-medium text-xs truncate max-w-32">
           {user?.role === 'seller'
             ? (user as Seller).businessName
-            : user?.role === 'buyer'
+            : user?.role === 'buyer' || user?.role === 'admin'
               ? user.name
               : 'Sin sesión'}
         </span>

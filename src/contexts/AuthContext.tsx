@@ -58,6 +58,7 @@ interface AuthContextType {
   isHydrated: boolean
   isSeller: boolean
   isBuyer: boolean
+  isAdmin: boolean
   subscriptionPlan: SubscriptionPlan
   login: (userId: string) => void
   logout: () => void
@@ -111,6 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isSeller = user?.role === 'seller'
   const isBuyer = user?.role === 'buyer'
+  const isAdmin = user?.role === 'admin'
   const subscriptionPlan: SubscriptionPlan = isSeller
     ? (user as Seller).subscriptionPlan
     : 'none'
@@ -123,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isHydrated,
         isSeller,
         isBuyer,
+        isAdmin,
         subscriptionPlan,
         login,
         logout,

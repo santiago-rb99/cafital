@@ -19,7 +19,7 @@ export const mockOrders: Order[] = [
       {
         publicationId: 'pub-001',
         publicationTitle: 'Café Verde Caranavi Gesha Natural 2025',
-        photo: 'https://picsum.photos/seed/cafeverde01/800/800',
+        photo: '/images/productos/cafe-insumos/pergamino-1.jpg',
         unit: 'Quintal (46 kg)',
         quantity: 2,
         unitPrice: 7200,
@@ -39,7 +39,7 @@ export const mockOrders: Order[] = [
       {
         publicationId: 'pub-003',
         publicationTitle: 'Café Tostado Yungas Blend Espresso 500g',
-        photo: 'https://picsum.photos/seed/cafetostado03/800/800',
+        photo: '/images/productos/cafe-insumos/bolsa-cafe-1.webp',
         unit: 'Kilogramo',
         quantity: 10,
         unitPrice: 320,
@@ -47,7 +47,7 @@ export const mockOrders: Order[] = [
       {
         publicationId: 'pub-004',
         publicationTitle: 'Café Molido Filtro Origen Caranavi',
-        photo: 'https://picsum.photos/seed/cafemolido04/800/800',
+        photo: '/images/productos/cafe-insumos/bolsa-cafe-1.webp',
         unit: 'Kilogramo',
         quantity: 5,
         unitPrice: 390,
@@ -67,7 +67,7 @@ export const mockOrders: Order[] = [
       {
         publicationId: 'pub-009',
         publicationTitle: 'Curso de Barismo Profesional — Nivel Intermedio',
-        photo: 'https://picsum.photos/seed/barismo09/800/800',
+        photo: '/images/eventos/alquimia-cata-1.jpg',
         unit: 'Por persona',
         quantity: 2,
         unitPrice: 450,
@@ -87,7 +87,7 @@ export const mockOrders: Order[] = [
       {
         publicationId: 'pub-002',
         publicationTitle: 'Café Verde Bourbon Lavado Nor Yungas',
-        photo: 'https://picsum.photos/seed/cafeverde02/800/800',
+        photo: '/images/productos/cafe-insumos/pergamino-1.jpg',
         unit: 'Saco (60 kg)',
         quantity: 3,
         unitPrice: 5580,
@@ -107,7 +107,7 @@ export const mockOrders: Order[] = [
       {
         publicationId: 'pub-005',
         publicationTitle: 'Fertilizante Foliar Orgánico para Café - 20L',
-        photo: 'https://picsum.photos/seed/fertilizante05/800/800',
+        photo: '/images/productos/cafe-insumos/fertilizante-natural-celccar.jpg',
         unit: 'Unidad',
         quantity: 4,
         unitPrice: 850,
@@ -118,6 +118,46 @@ export const mockOrders: Order[] = [
     shippingAddress: BUYER_01_ADDRESS,
     createdAt: '2026-02-28T10:20:00Z',
   },
+  {
+    id: 'ord-006',
+    buyerId: 'buyer-01',
+    sellerId: 'seller-hefesto',
+    sellerName: 'Hefesto Maquinaria Cafetera',
+    items: [
+      {
+        publicationId: 'pub-038',
+        publicationTitle: 'Cangilones Metálicos para Elevadores — Pack 20',
+        photo: '/images/productos/maquinaria/cangilones-metalicos.jpg',
+        unit: 'Pack 20 unidades',
+        quantity: 2,
+        unitPrice: 1450,
+      },
+    ],
+    total: 2900,
+    status: 'in_process',
+    shippingAddress: BUYER_01_ADDRESS,
+    createdAt: '2026-05-20T11:30:00Z',
+  },
+  {
+    id: 'ord-007',
+    buyerId: 'buyer-01',
+    sellerId: 'seller-bob',
+    sellerName: 'Best of Bolivia Coffee',
+    items: [
+      {
+        publicationId: 'pub-024',
+        publicationTitle: 'Bolsas Stand-up con Válvula 1kg — Pack 100',
+        photo: '/images/productos/cafe-insumos/bolsa-valvula-pie-hermetico-1.jpg',
+        unit: 'Pack 100 unidades',
+        quantity: 3,
+        unitPrice: 480,
+      },
+    ],
+    total: 1440,
+    status: 'completed',
+    shippingAddress: BUYER_01_ADDRESS,
+    createdAt: '2026-04-25T13:10:00Z',
+  },
 ]
 
 export const mockRecurringSubscriptions: RecurringSubscription[] = [
@@ -126,7 +166,7 @@ export const mockRecurringSubscriptions: RecurringSubscription[] = [
     buyerId: 'buyer-01',
     publicationId: 'pub-003',
     publicationTitle: 'Café Tostado Yungas Blend Espresso 500g',
-    photo: 'https://picsum.photos/seed/cafetostado03/800/800',
+    photo: '/images/productos/cafe-insumos/bolsa-cafe-1.webp',
     unit: 'Kilogramo',
     quantity: 5,
     unitPrice: 320,
@@ -139,7 +179,7 @@ export const mockRecurringSubscriptions: RecurringSubscription[] = [
     buyerId: 'buyer-01',
     publicationId: 'pub-005',
     publicationTitle: 'Fertilizante Foliar Orgánico para Café - 20L',
-    photo: 'https://picsum.photos/seed/fertilizante05/800/800',
+    photo: '/images/productos/cafe-insumos/fertilizante-natural-celccar.jpg',
     unit: 'Litro',
     quantity: 20,
     unitPrice: 45,

@@ -60,12 +60,15 @@ export default function PerfilPage() {
     if (user.role === 'buyer') {
       setName(user.name)
       setAvatarUrl(user.avatar ?? null)
-    } else {
+    } else if (user.role === 'seller') {
       setName(user.businessName)
       setMunicipality(user.municipality ?? '')
       setNit(user.nit ?? '')
       setBannerUrl(user.banner ?? null)
       setLogoUrl(user.logo ?? null)
+    } else {
+      setName(user.name)
+      setAvatarUrl(user.avatar ?? null)
     }
     setDepartment(user.department ?? '')
     setDescription(user.description ?? '')

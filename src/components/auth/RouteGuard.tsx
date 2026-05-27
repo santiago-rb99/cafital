@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
 
 interface RouteGuardProps {
-  requireRole?: 'buyer' | 'seller'
+  requireRole?: 'buyer' | 'seller' | 'admin'
   children: ReactNode
 }
 
@@ -34,7 +34,9 @@ export function RouteGuard({ requireRole, children }: RouteGuardProps) {
           'Acceso restringido',
           requireRole === 'seller'
             ? 'Esta sección es solo para vendedores.'
-            : 'Esta sección requiere una cuenta de comprador.'
+            : requireRole === 'admin'
+              ? 'Esta sección es solo para administradores.'
+              : 'Esta sección requiere una cuenta de comprador.'
         )
       }
       router.replace('/')

@@ -16,10 +16,17 @@ export interface BaseUser {
   description?: string
   department?: string
   createdAt: string
+  /** Marca administrativa: el usuario está suspendido y no puede operar. */
+  suspended?: boolean
 }
 
 export interface Buyer extends BaseUser {
   role: 'buyer'
+  name: string
+}
+
+export interface Admin extends BaseUser {
+  role: 'admin'
   name: string
 }
 
@@ -39,6 +46,14 @@ export interface Seller extends BaseUser {
    * catálogo y vendedores. Si no existe, el hero cae al `banner`.
    */
   heroImage?: string
+  /** Copy promocional del slide del hero (máx. ~140 chars). */
+  heroCopy?: string
+  /** Evento elegido para destacar en el hero de Eventos. */
+  promotedEventId?: string
+  /** Apariciones consumidas en el período en curso. */
+  adAppearancesUsed?: number
+  /** Inicio ISO del período de cómputo de apariciones (típicamente día 1 del mes). */
+  adAppearancesPeriodStart?: string
   about?: {
     mission?: string
     vision?: string
@@ -47,7 +62,7 @@ export interface Seller extends BaseUser {
   profileImages?: string[]
 }
 
-export type User = Buyer | Seller
+export type User = Buyer | Seller | Admin
 
 /* ─── PUBLICATIONS ──────────────────────────────────────────── */
 export type PublicationCategory = 'A' | 'B' | 'C' | 'D'
@@ -80,6 +95,8 @@ export interface Publication {
   status: PublicationStatus
   views?: number
   createdAt: string
+  /** Marca de destacado por el equipo administrativo. */
+  featured?: boolean
 }
 
 /* ─── EVENTS ────────────────────────────────────────────────── */

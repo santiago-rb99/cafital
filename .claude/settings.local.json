@@ -20,10 +20,18 @@
       "Bash(curl -sS -o /dev/null -w \"GET /mi-tienda/pedidos -> %{http_code}\\\\n\" http://localhost:3000/mi-tienda/pedidos)",
       "Bash(curl -sS -o /dev/null -w \"GET /pedido/ord-002 -> %{http_code}\\\\n\" http://localhost:3000/pedido/ord-002)",
       "Bash(curl -sS -o /dev/null -w \"GET /catalogo -> %{http_code}\\\\n\" http://localhost:3000/catalogo)",
-      "Bash(curl -sf -o /dev/null http://localhost:3000/)"
+      "Bash(curl -sf -o /dev/null http://localhost:3000/)",
+      "Bash(mv \"PRODUCTOS \" productos)",
+      "Bash(mv EVENTOS eventos)",
+      "Bash(mv \"Cafe e insumos\" cafe-insumos)",
+      "Bash(mv \"Maquinaria y equipos\" maquinaria)",
+      "Bash(mv \"Servicios profecionales\" servicios)",
+      "Bash(mv \"Terrenos y fincas\" terrenos)",
+      "Bash(cd /Users/santiagorojasblanco/Documents/UCB/cafital/public/images/productos/maquinaria && mv \"Perfil vendedor maquina\" perfil-vendedor && ls)"
     ],
     "additionalDirectories": [
-      "/Users/santiagorojasblanco/Documents/UCB/cafital/src/components"
+      "/Users/santiagorojasblanco/Documents/UCB/cafital/src/components",
+      "/Users/santiagorojasblanco/Documents/UCB/cafital/public/images/productos/maquinaria/Perfil vendedor maquina"
     ]
   }
 }

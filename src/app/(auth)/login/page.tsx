@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Lock,
   Mail,
+  ShieldCheck,
   Store,
   User as UserIcon,
 } from 'lucide-react'
@@ -229,6 +230,7 @@ function LoginPageInner() {
           {DEV_USERS.map((u) => {
             const fullUser = ALL_MOCK_USERS.find((m) => m.id === u.id)
             const isSeller = u.role === 'Vendedor'
+            const isAdmin = u.role === 'Administrador'
             const avatarSrc = isSeller
               ? (fullUser as Seller | undefined)?.logo
               : fullUser?.avatar
@@ -244,13 +246,22 @@ function LoginPageInner() {
                   aria-busy={isLoadingThis || undefined}
                   className="group flex w-full items-center gap-3 rounded-lg border border-neutral-200 bg-white px-3 py-3 text-left transition-colors hover:border-primary-500 hover:bg-primary-50 focus:outline-none focus-visible:border-primary-500 focus-visible:ring-3 focus-visible:ring-primary-100 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-neutral-200 disabled:hover:bg-white"
                 >
-                  <Avatar
-                    src={avatarSrc}
-                    alt={isSeller ? `Logo de ${u.label}` : u.label}
-                    fallback={u.label}
-                    size="sm"
-                    square={isSeller}
-                  />
+                  {isAdmin ? (
+                    <span
+                      aria-hidden
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary-100 text-secondary-700"
+                    >
+                      <ShieldCheck size={18} strokeWidth={1.5} />
+                    </span>
+                  ) : (
+                    <Avatar
+                      src={avatarSrc}
+                      alt={isSeller ? `Logo de ${u.label}` : u.label}
+                      fallback={u.label}
+                      size="sm"
+                      square={isSeller}
+                    />
+                  )}
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
@@ -270,6 +281,8 @@ function LoginPageInner() {
                       <span className="inline-flex items-center gap-1">
                         {u.role === 'Comprador' ? (
                           <UserIcon size={12} strokeWidth={1.5} aria-hidden />
+                        ) : isAdmin ? (
+                          <ShieldCheck size={12} strokeWidth={1.5} aria-hidden />
                         ) : (
                           <Store size={12} strokeWidth={1.5} aria-hidden />
                         )}

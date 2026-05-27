@@ -31,8 +31,11 @@ export function buildSellerHeroSlides(
       image:
         seller.heroImage ??
         seller.banner ??
-        `https://picsum.photos/seed/${seller.id}-hero/1400/900`,
-      copy: seller.description ?? `Conoce a ${seller.businessName} en Cafital.`,
+        '/images/eventos/expo-cafe-hero.jpg',
+      copy:
+        seller.heroCopy ??
+        seller.description ??
+        `Conoce a ${seller.businessName} en Cafital.`,
     }))
 }
 
@@ -58,7 +61,12 @@ export function buildEventHeroSlides(
       const planScore = organizer ? PLAN_PRIORITY[organizer.subscriptionPlan] : 0
       const typeBoost =
         event.type === 'feria' || event.type === 'competencia' ? 1 : 0
-      return { event, organizer, score: planScore * 10 + typeBoost * 5 }
+      const promotedBoost = organizer?.promotedEventId === event.id ? 1 : 0
+      return {
+        event,
+        organizer,
+        score: planScore * 10 + typeBoost * 5 + promotedBoost * 100,
+      }
     })
     .filter((entry) => entry.score > 0)
     .sort((a, b) => {

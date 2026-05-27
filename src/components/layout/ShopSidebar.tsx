@@ -7,12 +7,14 @@ import {
   BarChart3,
   Calendar,
   LayoutDashboard,
+  Megaphone,
   Package,
   Plus,
   Settings,
   ShoppingBag,
   Sparkles,
   Store,
+  UserCircle,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Avatar, Badge } from '@/components/ui'
@@ -54,6 +56,16 @@ const SHOP_NAV: NavItem[] = [
     label: 'Estadísticas',
     icon: <BarChart3 size={18} strokeWidth={1.5} />,
     requiresPlan: 'exportacion',
+  },
+  {
+    href: '/mi-tienda/perfil',
+    label: 'Mi perfil público',
+    icon: <UserCircle size={18} strokeWidth={1.5} />,
+  },
+  {
+    href: '/mi-tienda/publicidad',
+    label: 'Publicidad',
+    icon: <Megaphone size={18} strokeWidth={1.5} />,
   },
   {
     href: '/mi-tienda/planes',

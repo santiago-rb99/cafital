@@ -24,8 +24,13 @@ export function ShopShell({ children }: { children: ReactNode }) {
 
   // Si un comprador intenta entrar por URL a una sub-ruta exclusiva de
   // vendedor, lo enviamos de vuelta a la landing.
+  // Si un admin cae aquí, lo derivamos a su panel.
   useEffect(() => {
     if (!isHydrated) return
+    if (user?.role === 'admin') {
+      router.replace('/admin')
+      return
+    }
     if (user && user.role === 'buyer' && pathname && !BUYER_ALLOWED_PATHS.has(pathname)) {
       router.replace('/mi-tienda')
     }

@@ -43,11 +43,12 @@ const PUBLIC_NAV_LINKS = [
 ] as const
 
 const SHOP_LINK = { href: '/mi-tienda', label: 'Mi Tienda' } as const
+const ADMIN_LINK = { href: '/admin', label: 'Panel admin' } as const
 
 export function MarketplaceHeader() {
   const router = useRouter()
   const pathname = usePathname()
-  const { user, isSeller, logout } = useAuth()
+  const { user, isSeller, isAdmin, logout } = useAuth()
   const { itemCount, clearCart } = useCart()
   const { showSuccess, showError } = useToast()
   const [loggingOut, setLoggingOut] = useState(false)
@@ -209,11 +210,24 @@ export function MarketplaceHeader() {
                       {user.email}
                     </p>
                   </div>
-                  <AccountMenu
-                    isSeller={isSeller}
-                    pathname={pathname}
-                    onSelect={() => setMenuOpen(false)}
-                  />
+                  {!isAdmin && (
+                    <AccountMenu
+                      isSeller={isSeller}
+                      pathname={pathname}
+                      onSelect={() => setMenuOpen(false)}
+                    />
+                  )}
+                  {isAdmin && (
+                    <Link
+                      href="/admin"
+                      role="menuitem"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 text-sm text-neutral-900 transition-colors hover:bg-neutral-100"
+                    >
+                      <LayoutDashboard size={16} strokeWidth={1.5} className="text-neutral-500" />
+                      Panel admin
+                    </Link>
+                  )}
                   <div className="border-t border-neutral-200">
                     <button
                       type="button"
@@ -267,13 +281,23 @@ export function MarketplaceHeader() {
               </NavLink>
             </li>
           ))}
-          {user && (
+          {user && !isAdmin && (
             <li className="shrink-0">
               <NavLink
                 href={SHOP_LINK.href}
                 active={isActive(pathname, SHOP_LINK.href)}
               >
                 {SHOP_LINK.label}
+              </NavLink>
+            </li>
+          )}
+          {isAdmin && (
+            <li className="shrink-0">
+              <NavLink
+                href={ADMIN_LINK.href}
+                active={isActive(pathname, ADMIN_LINK.href)}
+              >
+                {ADMIN_LINK.label}
               </NavLink>
             </li>
           )}
@@ -290,6 +314,7 @@ export function MarketplaceHeader() {
         pathname={pathname}
         user={user}
         isSeller={isSeller}
+        isAdmin={isAdmin}
         displayName={displayName}
         avatarSrc={avatarSrc}
       />
@@ -394,6 +419,7 @@ interface MobileMenuProps {
   pathname: string | null
   user: ReturnType<typeof useAuth>['user']
   isSeller: boolean
+  isAdmin: boolean
   displayName: string
   avatarSrc: string | undefined
 }
@@ -408,6 +434,7 @@ function MobileMenu({
   pathname,
   user,
   isSeller,
+  isAdmin,
   displayName,
   avatarSrc,
 }: MobileMenuProps) {
@@ -437,7 +464,7 @@ function MobileMenu({
                 {link.label}
               </MobileNavLink>
             ))}
-            {user && (
+            {user && !isAdmin && (
               <MobileNavLink
                 href={SHOP_LINK.href}
                 active={isActive(pathname, SHOP_LINK.href)}
@@ -446,10 +473,19 @@ function MobileMenu({
                 {SHOP_LINK.label}
               </MobileNavLink>
             )}
+            {isAdmin && (
+              <MobileNavLink
+                href={ADMIN_LINK.href}
+                active={isActive(pathname, ADMIN_LINK.href)}
+                onSelect={onClose}
+              >
+                {ADMIN_LINK.label}
+              </MobileNavLink>
+            )}
           </ul>
         </nav>
 
-        {user && (
+        {user && !isAdmin && (
           <nav aria-label="Mi cuenta">
             <p className="mb-1 px-3 text-xs font-medium uppercase tracking-wider text-neutral-500">
               Mi cuenta
